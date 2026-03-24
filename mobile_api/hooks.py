@@ -5,6 +5,56 @@ app_description = "Mobile Frappe"
 app_email = "himiismail123@gmail.com"
 app_license = "mit"
 
+fixtures = [
+	{
+		"doctype": "Custom Field",
+		"filters": [
+			[
+				"name",
+				"in",
+				(
+					"Lead-mobile_api_follow_up_section",
+					"Lead-mobile_api_last_update_date",
+					"Lead-mobile_api_next_follow_up_date",
+					"Lead-mobile_api_last_follow_up_report",
+					"Lead-mobile_api_follow_up_attachment",
+					"Lead-mobile_api_follow_ups",
+					"Opportunity-mobile_api_follow_up_section",
+					"Opportunity-mobile_api_last_update_date",
+					"Opportunity-mobile_api_next_follow_up_date",
+					"Opportunity-mobile_api_last_follow_up_report",
+					"Opportunity-mobile_api_follow_up_attachment",
+					"Opportunity-mobile_api_follow_ups",
+					"Quotation-mobile_api_follow_up_section",
+					"Quotation-mobile_api_last_update_date",
+					"Quotation-mobile_api_next_follow_up_date",
+					"Quotation-mobile_api_last_follow_up_report",
+					"Quotation-mobile_api_follow_up_attachment",
+					"Quotation-mobile_api_follow_ups",
+				),
+			]
+		],
+	}
+]
+
+doctype_js = {
+	"Lead": "public/js/crm_follow_up.js",
+	"Opportunity": "public/js/crm_follow_up.js",
+	"Quotation": "public/js/crm_follow_up.js",
+}
+
+doc_events = {
+	"Lead": {
+		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
+	},
+	"Opportunity": {
+		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
+	},
+	"Quotation": {
+		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
+	},
+}
+
 # Apps
 # ------------------
 
@@ -241,4 +291,3 @@ app_license = "mit"
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-

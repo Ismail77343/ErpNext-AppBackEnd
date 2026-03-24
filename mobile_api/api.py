@@ -16,6 +16,10 @@ from mobile_api.handlers.task_handler import (
     add_follow_up,
     update_task_status
 )
+from mobile_api.handlers.crm_follow_up_handler import (
+    get_crm_doc_details,
+    add_crm_follow_up,
+)
 from mobile_api.handlers.material_request_handler import (
     create_material_request
 )
@@ -28,5 +32,7 @@ __all__ = [
     'get_task_details',
     'add_follow_up',
     'update_task_status',
+    'get_crm_doc_details',
+    'add_crm_follow_up',
     'create_material_request'
 ]

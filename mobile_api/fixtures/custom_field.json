@@ -1,0 +1,182 @@
+[
+  {
+    "doctype": "Custom Field",
+    "dt": "Lead",
+    "fieldname": "mobile_api_follow_up_section",
+    "fieldtype": "Section Break",
+    "insert_after": "notes",
+    "label": "Mobile API Follow Up",
+    "name": "Lead-mobile_api_follow_up_section"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Lead",
+    "fieldname": "mobile_api_last_update_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_follow_up_section",
+    "label": "Last Update Date",
+    "read_only": 1,
+    "name": "Lead-mobile_api_last_update_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Lead",
+    "fieldname": "mobile_api_next_follow_up_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_last_update_date",
+    "label": "Next Follow Up Date",
+    "read_only": 1,
+    "name": "Lead-mobile_api_next_follow_up_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Lead",
+    "fieldname": "mobile_api_last_follow_up_report",
+    "fieldtype": "Small Text",
+    "insert_after": "mobile_api_next_follow_up_date",
+    "label": "Last Follow Up Report",
+    "read_only": 1,
+    "name": "Lead-mobile_api_last_follow_up_report"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Lead",
+    "fieldname": "mobile_api_follow_up_attachment",
+    "fieldtype": "Attach",
+    "insert_after": "mobile_api_last_follow_up_report",
+    "label": "Follow Up Attachment",
+    "read_only": 1,
+    "name": "Lead-mobile_api_follow_up_attachment"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Lead",
+    "fieldname": "mobile_api_follow_ups",
+    "fieldtype": "Table",
+    "insert_after": "mobile_api_follow_up_attachment",
+    "label": "Follow Up History",
+    "options": "Mobile CRM Follow Up",
+    "read_only": 1,
+    "name": "Lead-mobile_api_follow_ups"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Opportunity",
+    "fieldname": "mobile_api_follow_up_section",
+    "fieldtype": "Section Break",
+    "insert_after": "notes",
+    "label": "Mobile API Follow Up",
+    "name": "Opportunity-mobile_api_follow_up_section"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Opportunity",
+    "fieldname": "mobile_api_last_update_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_follow_up_section",
+    "label": "Last Update Date",
+    "read_only": 1,
+    "name": "Opportunity-mobile_api_last_update_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Opportunity",
+    "fieldname": "mobile_api_next_follow_up_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_last_update_date",
+    "label": "Next Follow Up Date",
+    "read_only": 1,
+    "name": "Opportunity-mobile_api_next_follow_up_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Opportunity",
+    "fieldname": "mobile_api_last_follow_up_report",
+    "fieldtype": "Small Text",
+    "insert_after": "mobile_api_next_follow_up_date",
+    "label": "Last Follow Up Report",
+    "read_only": 1,
+    "name": "Opportunity-mobile_api_last_follow_up_report"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Opportunity",
+    "fieldname": "mobile_api_follow_up_attachment",
+    "fieldtype": "Attach",
+    "insert_after": "mobile_api_last_follow_up_report",
+    "label": "Follow Up Attachment",
+    "read_only": 1,
+    "name": "Opportunity-mobile_api_follow_up_attachment"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Opportunity",
+    "fieldname": "mobile_api_follow_ups",
+    "fieldtype": "Table",
+    "insert_after": "mobile_api_follow_up_attachment",
+    "label": "Follow Up History",
+    "options": "Mobile CRM Follow Up",
+    "read_only": 1,
+    "name": "Opportunity-mobile_api_follow_ups"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Quotation",
+    "fieldname": "mobile_api_follow_up_section",
+    "fieldtype": "Section Break",
+    "insert_after": "notes",
+    "label": "Mobile API Follow Up",
+    "name": "Quotation-mobile_api_follow_up_section"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Quotation",
+    "fieldname": "mobile_api_last_update_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_follow_up_section",
+    "label": "Last Update Date",
+    "read_only": 1,
+    "name": "Quotation-mobile_api_last_update_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Quotation",
+    "fieldname": "mobile_api_next_follow_up_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_last_update_date",
+    "label": "Next Follow Up Date",
+    "read_only": 1,
+    "name": "Quotation-mobile_api_next_follow_up_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Quotation",
+    "fieldname": "mobile_api_last_follow_up_report",
+    "fieldtype": "Small Text",
+    "insert_after": "mobile_api_next_follow_up_date",
+    "label": "Last Follow Up Report",
+    "read_only": 1,
+    "name": "Quotation-mobile_api_last_follow_up_report"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Quotation",
+    "fieldname": "mobile_api_follow_up_attachment",
+    "fieldtype": "Attach",
+    "insert_after": "mobile_api_last_follow_up_report",
+    "label": "Follow Up Attachment",
+    "read_only": 1,
+    "name": "Quotation-mobile_api_follow_up_attachment"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Quotation",
+    "fieldname": "mobile_api_follow_ups",
+    "fieldtype": "Table",
+    "insert_after": "mobile_api_follow_up_attachment",
+    "label": "Follow Up History",
+    "options": "Mobile CRM Follow Up",
+    "read_only": 1,
+    "name": "Quotation-mobile_api_follow_ups"
+  }
+]
