@@ -1,0 +1,309 @@
+Lead Document API
+=================
+
+This file explains the Lead API response structure for frontend developers.
+
+
+1. Get Lead Details
+-------------------
+
+Method:
+GET /api/method/mobile_api.api.get_lead_details?lead_name=<LEAD_ID>
+
+Response:
+
+{
+  "status": "success",
+  "data": {
+    "id": "CRM-LEAD-.2026.-00001",
+    "doctype": "Lead",
+    "identity": {
+      "name": "CRM-LEAD-.2026.-00001",
+      "display_name": "Ahmed Ali",
+      "lead_name": "Ahmed Ali",
+      "first_name": "Ahmed",
+      "middle_name": null,
+      "last_name": "Ali",
+      "company_name": "Test Company"
+    },
+    "status": {
+      "current": "Lead",
+      "source": "Website",
+      "owner": "administrator@example.com"
+    },
+    "contact": {
+      "email": "ahmed@test.com",
+      "mobile": "0500000000",
+      "whatsapp": "0500000000",
+      "phone": "0110000000"
+    },
+    "address": {
+      "city": "Riyadh",
+      "country": "Saudi Arabia",
+      "territory": "All Territories"
+    },
+    "notes": "Lead notes",
+    "follow_up_summary": {
+      "last_update_date": "2026-03-24",
+      "next_follow_up_date": "2026-03-30",
+      "last_follow_up_report": "Client contacted and waiting for reply",
+      "attachment": "/files/lead-follow.pdf"
+    },
+    "follow_ups": [
+      {
+        "id": "abc123",
+        "follow_up_date": "2026-03-24",
+        "expected_result_date": "2026-03-30",
+        "details": "Client contacted and waiting for reply",
+        "attachment": "/files/lead-follow.pdf",
+        "registered_on": "2026-03-24 10:30:00"
+      }
+    ],
+    "activity_log": [
+      {
+        "id": "COMMENT-0001",
+        "comment_by": "Administrator",
+        "creation": "2026-03-24 10:31:00",
+        "content": "Lead updated"
+      }
+    ]
+  }
+}
+
+
+2. Get Leads List
+-----------------
+
+Method:
+GET /api/method/mobile_api.api.get_leads?limit_start=0&limit_page_length=20&status=Lead&search=CRM
+
+Response:
+
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "CRM-LEAD-.2026.-00001",
+      "doctype": "Lead",
+      "display_name": "Ahmed Ali",
+      "company_name": "Test Company",
+      "status": "Lead",
+      "source": "Website",
+      "owner": "administrator@example.com",
+      "contact": {
+        "email": "ahmed@test.com",
+        "mobile": "0500000000"
+      },
+      "follow_up_summary": {
+        "last_update_date": "2026-03-24",
+        "next_follow_up_date": "2026-03-30",
+        "last_follow_up_report": "Client contacted and waiting for reply"
+      },
+      "modified": "2026-03-24 10:31:00"
+    }
+  ],
+  "limit_start": 0,
+  "limit_page_length": 20,
+  "filters": {
+    "status": "Lead",
+    "search": "CRM"
+  }
+}
+
+
+3. Create Lead
+--------------
+
+Method:
+POST /api/method/mobile_api.api.create_lead
+
+Request body:
+
+{
+  "data": {
+    "first_name": "Ahmed",
+    "last_name": "Ali",
+    "mobile_no": "0500000000",
+    "email_id": "ahmed@test.com"
+  }
+}
+
+Success response:
+
+{
+  "status": "success",
+  "message": "تم إنشاء Lead بنجاح",
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "data": { ...same structure as Get Lead Details data... }
+}
+
+Validation error response:
+
+{
+  "status": "error",
+  "message": "بعض الحقول الإلزامية غير موجودة",
+  "missing_fields": [
+    {
+      "fieldname": "mobile_no",
+      "label": "Mobile No",
+      "fieldtype": "Data"
+    }
+  ]
+}
+
+
+4. Update Lead
+--------------
+
+Method:
+POST /api/method/mobile_api.api.update_lead
+
+Request body:
+
+{
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "data": {
+    "status": "Opportunity",
+    "company_name": "Updated Company"
+  }
+}
+
+Success response:
+
+{
+  "status": "success",
+  "message": "تم تحديث Lead بنجاح",
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "data": { ...same structure as Get Lead Details data... }
+}
+
+
+5. Add Lead Follow Up
+---------------------
+
+Method:
+POST /api/method/mobile_api.api.add_lead_follow_up
+
+Request body:
+
+{
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "follow_up_date": "2026-03-24",
+  "expected_result_date": "2026-03-30",
+  "details": "Client contacted and waiting for reply",
+  "attachment": "/files/lead-follow.pdf"
+}
+
+Success response:
+
+{
+  "status": "success",
+  "message": "تمت إضافة متابعة الـ Lead بنجاح",
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "follow_ups": [
+    {
+      "id": "abc123",
+      "follow_up_date": "2026-03-24",
+      "expected_result_date": "2026-03-30",
+      "details": "Client contacted and waiting for reply",
+      "attachment": "/files/lead-follow.pdf",
+      "registered_on": "2026-03-24 10:30:00"
+    }
+  ],
+  "last_update_date": "2026-03-24",
+  "next_follow_up_date": "2026-03-30",
+  "last_follow_up_report": "Client contacted and waiting for reply",
+  "data": { ...same structure as Get Lead Details data... }
+}
+
+
+6. Get Lead Follow Ups
+----------------------
+
+Method:
+GET /api/method/mobile_api.api.get_lead_follow_ups?lead_name=<LEAD_ID>
+
+Response:
+
+{
+  "status": "success",
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "follow_ups": [
+    {
+      "id": "abc123",
+      "follow_up_date": "2026-03-24",
+      "expected_result_date": "2026-03-30",
+      "details": "Client contacted and waiting for reply",
+      "attachment": "/files/lead-follow.pdf",
+      "registered_on": "2026-03-24 10:30:00"
+    }
+  ]
+}
+
+
+7. Get Lead Required Fields
+---------------------------
+
+Method:
+POST /api/method/mobile_api.api.get_lead_required_fields
+
+Request body:
+
+{
+  "data": {
+    "source": "Existing Customer",
+    "first_name": "Ahmed"
+  }
+}
+
+Response:
+
+{
+  "status": "success",
+  "doctype": "Lead",
+  "lead_name": null,
+  "default_values": {
+    "status": "Lead"
+  },
+  "required_fields": [
+    {
+      "fieldname": "mobile_no",
+      "label": "Mobile No",
+      "fieldtype": "Data"
+    }
+  ],
+  "missing_fields": [
+    {
+      "fieldname": "mobile_no",
+      "label": "Mobile No",
+      "fieldtype": "Data"
+    }
+  ]
+}
+
+Notes:
+- status is automatically defaulted to "Lead" on new Lead creation.
+- status is excluded from required_fields, so frontend should not ask user to enter it in create form.
+
+
+Frontend Notes
+--------------
+
+- Always use data.id as the main lead identifier.
+- In detail screens use:
+  data.identity
+  data.status
+  data.contact
+  data.address
+  data.follow_up_summary
+  data.follow_ups
+  data.activity_log
+- In list screens use:
+  item.id
+  item.display_name
+  item.status
+  item.contact.mobile
+  item.follow_up_summary.next_follow_up_date
+- Before create or update, frontend can call:
+  mobile_api.api.get_lead_required_fields
+  to know which fields are mandatory according to current customization.

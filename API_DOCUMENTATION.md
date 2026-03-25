@@ -11,23 +11,46 @@
 ```
 mobile_api/
 ├── api.py                          # نقطة الدخول الرئيسية
+├── documents/                      # تمثيل البيانات الجاهزة للتطبيق
+│   └── lead_document.py
 ├── handlers/                       # طبقة معالجة الطلبات
 │   ├── auth_handler.py
+│   ├── lead_handler.py
 │   ├── project_handler.py
 │   ├── task_handler.py
 │   └── material_request_handler.py
 ├── services/                       # طبقة منطق العمل
 │   ├── auth_service.py
+│   ├── lead_service.py
 │   ├── project_service.py
 │   ├── task_service.py
 │   └── material_request_service.py
 ├── repositories/                   # طبقة الوصول للبيانات
+│   ├── lead_repository.py
 │   ├── project_repository.py
 │   ├── task_repository.py
 │   └── material_request_repository.py
 └── utils/                          # أدوات مساعدة
+    ├── lead_utils.py
     └── task_utils.py
 ```
+
+---
+
+## 🧩 Lead Module
+
+تم تجهيز `Lead` داخل التطبيق بنفس مبدأ Clean Architecture، ويشمل:
+
+- إنشاء Lead
+- تعديل Lead
+- قراءة الحقول الإلزامية ديناميكيًا حسب الـ Customization
+- عرض بيانات Lead
+- إضافة Follow Up للـ Lead
+- عرض Follow Up الخاص بالـ Lead
+
+التوثيق التفصيلي:
+
+- `LEAD_API_DOCUMENTATION.md`
 
 ---
 
