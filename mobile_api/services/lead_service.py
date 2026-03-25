@@ -5,23 +5,152 @@ from mobile_api.utils.lead_utils import LeadUtils
 
 class LeadService:
     @staticmethod
-    def get_leads(limit_start=0, limit_page_length=20, status=None, search=None):
+    def get_lead_form(lead_name=None):
+        mode = "edit" if lead_name else "create"
+        doc = LeadRepository.get_lead(lead_name) if lead_name else LeadRepository.new_lead()
+        LeadUtils.apply_defaults(doc)
+
+        return {
+            "status": "success",
+            "mode": mode,
+            "lead_name": lead_name,
+            "default_values": {
+                "status": doc.get("status"),
+            },
+            "form_fields": LeadUtils.get_form_fields(doc, mode=mode),
+        }
+
+    @staticmethod
+    def apply_follow_up_filter(leads, follow_up_filter=None):
+        if not follow_up_filter:
+            return leads
+
+        filter_map = {
+            "overdue": lambda item: item["is_overdue"],
+            "today": lambda item: item["is_due_today"],
+            "this_week": lambda item: item["is_due_this_week"],
+            "month": lambda item: item["is_due_this_month"],
+            "never_contacted": lambda item: item["never_contacted"],
+            "upcoming": lambda item: (
+                item["next_follow_up_date"]
+                and not item["is_overdue"]
+                and not item["is_due_today"]
+            ),
+        }
+
+        matcher = filter_map.get(follow_up_filter)
+        if not matcher:
+            return leads
+
+        return [item for item in leads if matcher(item)]
+
+    @staticmethod
+    def sort_leads(leads, sort_by=None):
+        if sort_by == "next_follow_up_date_asc":
+            return sorted(
+                leads,
+                key=lambda item: (
+                    item["next_follow_up_date"] is None,
+                    item["next_follow_up_date"] or "9999-12-31",
+                    item["modified"],
+                ),
+            )
+
+        if sort_by == "overdue_first":
+            return sorted(
+                leads,
+                key=lambda item: (
+                    not item["is_overdue"],
+                    item["next_follow_up_date"] or "9999-12-31",
+                    item["modified"],
+                ),
+            )
+
+        if sort_by == "never_contacted_first":
+            return sorted(
+                leads,
+                key=lambda item: (
+                    not item["never_contacted"],
+                    item["next_follow_up_date"] or "9999-12-31",
+                    item["modified"],
+                ),
+            )
+
+        return leads
+
+    @staticmethod
+    def build_dashboard_summary(leads):
+        return {
+            "overdue_count": sum(1 for item in leads if item["is_overdue"]),
+            "today_count": sum(1 for item in leads if item["is_due_today"]),
+            "this_week_count": sum(1 for item in leads if item["is_due_this_week"]),
+            "month_count": sum(1 for item in leads if item["is_due_this_month"]),
+            "never_contacted_count": sum(1 for item in leads if item["never_contacted"]),
+            "upcoming_count": sum(
+                1
+                for item in leads
+                if item["next_follow_up_date"] and not item["is_overdue"] and not item["is_due_today"]
+            ),
+        }
+
+    @staticmethod
+    def get_leads(
+        limit_start=0,
+        limit_page_length=20,
+        status=None,
+        search=None,
+        follow_up_filter=None,
+        sort_by=None,
+    ):
         filters = {}
         if status:
             filters["status"] = status
 
-        leads = LeadRepository.get_leads(
+        rows = LeadRepository.query_leads(
             filters=filters,
             search=search,
-            limit_start=int(limit_start or 0),
-            limit_page_length=int(limit_page_length or 20),
+            limit_start=None,
+            limit_page_length=None,
         )
+        leads = [LeadDocument.to_list_item(row) for row in rows]
+        leads = LeadService.apply_follow_up_filter(leads, follow_up_filter=follow_up_filter)
+        leads = LeadService.sort_leads(leads, sort_by=sort_by)
+
+        start = int(limit_start or 0)
+        page_length = int(limit_page_length or 20)
+        paginated = leads[start:start + page_length]
 
         return {
             "status": "success",
-            "data": [LeadDocument.to_list_item(row) for row in leads],
-            "limit_start": int(limit_start or 0),
-            "limit_page_length": int(limit_page_length or 20),
+            "data": paginated,
+            "total_count": len(leads),
+            "limit_start": start,
+            "limit_page_length": page_length,
+            "filters": {
+                "status": status,
+                "search": search,
+                "follow_up_filter": follow_up_filter,
+                "sort_by": sort_by,
+            },
+        }
+
+    @staticmethod
+    def get_leads_dashboard_summary(status=None, search=None):
+        filters = {}
+        if status:
+            filters["status"] = status
+
+        rows = LeadRepository.query_leads(
+            filters=filters,
+            search=search,
+            limit_start=None,
+            limit_page_length=None,
+        )
+        leads = [LeadDocument.to_list_item(row) for row in rows]
+
+        return {
+            "status": "success",
+            "summary": LeadService.build_dashboard_summary(leads),
             "filters": {
                 "status": status,
                 "search": search,
@@ -36,6 +165,7 @@ class LeadService:
         return {
             "status": "success",
             "data": LeadDocument.to_detail(doc, follow_ups=follow_ups, activity_log=activity_log),
+            "form": LeadUtils.get_form_fields(doc, mode="edit"),
         }
 
     @staticmethod
@@ -65,6 +195,7 @@ class LeadService:
             },
             "required_fields": required_fields,
             "missing_fields": missing_fields,
+            "form_fields": LeadUtils.get_form_fields(doc, mode="edit" if lead_name else "create"),
         }
 
     @staticmethod

@@ -4,16 +4,36 @@ from mobile_api.services.lead_service import LeadService
 
 
 @frappe.whitelist()
-def get_leads(limit_start=0, limit_page_length=20, status=None, search=None):
+def get_lead_form(lead_name=None):
+    try:
+        return LeadService.get_lead_form(lead_name=lead_name)
+    except Exception as exc:
+        frappe.log_error(frappe.get_traceback(), "get_lead_form")
+        return {"status": "error", "message": str(exc)}
+
+
+@frappe.whitelist()
+def get_leads(limit_start=0, limit_page_length=20, status=None, search=None, follow_up_filter=None, sort_by=None):
     try:
         return LeadService.get_leads(
             limit_start=limit_start,
             limit_page_length=limit_page_length,
             status=status,
             search=search,
+            follow_up_filter=follow_up_filter,
+            sort_by=sort_by,
         )
     except Exception as exc:
         frappe.log_error(frappe.get_traceback(), "get_leads")
+        return {"status": "error", "message": str(exc)}
+
+
+@frappe.whitelist()
+def get_leads_dashboard_summary(status=None, search=None):
+    try:
+        return LeadService.get_leads_dashboard_summary(status=status, search=search)
+    except Exception as exc:
+        frappe.log_error(frappe.get_traceback(), "get_leads_dashboard_summary")
         return {"status": "error", "message": str(exc)}
 
 

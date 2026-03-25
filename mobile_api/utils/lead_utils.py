@@ -4,6 +4,7 @@ import frappe
 class LeadUtils:
     DEFAULT_STATUS = "Lead"
     EXCLUDED_REQUIRED_FIELDS = {"status"}
+    EXCLUDED_FORM_FIELDS = {"name"}
     LAYOUT_FIELD_TYPES = {
         "Section Break",
         "Column Break",
@@ -13,6 +14,8 @@ class LeadUtils:
         "Button",
         "Image",
         "Heading",
+        "Table",
+        "Table MultiSelect",
     }
 
     @staticmethod
@@ -39,6 +42,32 @@ class LeadUtils:
             and field.fieldtype not in cls.LAYOUT_FIELD_TYPES
             and not field.read_only
         }
+
+    @staticmethod
+    def get_link_options(link_doctype, current_value=None, limit=20):
+        if not link_doctype or not frappe.db.exists("DocType", link_doctype):
+            return []
+
+        rows = frappe.get_all(
+            link_doctype,
+            fields=["name"],
+            order_by="modified desc",
+            limit_page_length=limit,
+        )
+        values = [{"label": row["name"], "value": row["name"]} for row in rows]
+
+        if current_value and all(option["value"] != current_value for option in values):
+            values.insert(0, {"label": current_value, "value": current_value})
+
+        return values
+
+    @staticmethod
+    def get_select_options(raw_options):
+        return [
+            {"label": option, "value": option}
+            for option in (raw_options or "").split("\n")
+            if option
+        ]
 
     @staticmethod
     def evaluate_depends_on(expression, doc):
@@ -84,6 +113,41 @@ class LeadUtils:
             doc.set("status", cls.DEFAULT_STATUS)
 
         return doc
+
+    @classmethod
+    def get_form_fields(cls, doc, mode="create"):
+        meta = frappe.get_meta(doc.doctype)
+        writable_fields = cls.get_writable_fields(meta)
+        form_fields = []
+
+        for fieldname, field in writable_fields.items():
+            if fieldname in cls.EXCLUDED_FORM_FIELDS:
+                continue
+
+            field_data = {
+                "fieldname": fieldname,
+                "label": field.label or fieldname,
+                "fieldtype": field.fieldtype,
+                "required": bool(field.reqd),
+                "read_only": bool(field.read_only),
+                "hidden": bool(field.hidden),
+                "value": doc.get(fieldname),
+            }
+
+            if field.fieldtype == "Select":
+                field_data["options"] = cls.get_select_options(field.options)
+            elif field.fieldtype == "Link":
+                field_data["options"] = cls.get_link_options(field.options, current_value=doc.get(fieldname))
+                field_data["link_doctype"] = field.options
+            else:
+                field_data["options"] = []
+
+            if mode == "edit" and fieldname == "status":
+                field_data["required"] = False
+
+            form_fields.append(field_data)
+
+        return form_fields
 
     @staticmethod
     def get_missing_fields(doc, required_fields):

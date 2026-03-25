@@ -28,17 +28,35 @@ class LeadRepository:
         return frappe.get_doc("Lead", lead_name)
 
     @classmethod
-    def get_leads(cls, filters=None, search=None, limit_start=0, limit_page_length=20):
+    def query_leads(cls, filters=None, search=None, limit_start=None, limit_page_length=None):
         lead_filters = filters or {}
+        or_filters = []
 
         if search:
-            lead_filters["name"] = ["like", f"%{search}%"]
+            like_value = f"%{search}%"
+            or_filters = [
+                ["Lead", "name", "like", like_value],
+                ["Lead", "lead_name", "like", like_value],
+                ["Lead", "company_name", "like", like_value],
+                ["Lead", "mobile_no", "like", like_value],
+                ["Lead", "email_id", "like", like_value],
+            ]
 
-        return frappe.get_list(
+        return frappe.get_all(
             "Lead",
             filters=lead_filters,
+            or_filters=or_filters or None,
             fields=cls.LIST_FIELDS,
             order_by="modified desc",
+            limit_start=limit_start,
+            limit_page_length=limit_page_length,
+        )
+
+    @classmethod
+    def get_leads(cls, filters=None, search=None, limit_start=0, limit_page_length=20):
+        return cls.query_leads(
+            filters=filters,
+            search=search,
             limit_start=limit_start,
             limit_page_length=limit_page_length,
         )

@@ -21,7 +21,9 @@ from mobile_api.handlers.crm_follow_up_handler import (
     add_crm_follow_up,
 )
 from mobile_api.handlers.lead_handler import (
+    get_lead_form,
     get_leads,
+    get_leads_dashboard_summary,
     get_lead_details,
     get_lead_follow_ups,
     get_lead_required_fields,
@@ -43,7 +45,9 @@ __all__ = [
     'update_task_status',
     'get_crm_doc_details',
     'add_crm_follow_up',
+    'get_lead_form',
     'get_leads',
+    'get_leads_dashboard_summary',
     'get_lead_details',
     'get_lead_follow_ups',
     'get_lead_required_fields',

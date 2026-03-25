@@ -4,6 +4,69 @@ Lead Document API
 This file explains the Lead API response structure for frontend developers.
 
 
+0. Get Lead Form
+----------------
+
+Method:
+GET /api/method/mobile_api.api.get_lead_form
+
+For edit:
+GET /api/method/mobile_api.api.get_lead_form?lead_name=<LEAD_ID>
+
+Response:
+
+{
+  "status": "success",
+  "mode": "edit",
+  "lead_name": "CRM-LEAD-.2026.-00001",
+  "default_values": {
+    "status": "Lead"
+  },
+  "form_fields": [
+    {
+      "fieldname": "source",
+      "label": "Source",
+      "fieldtype": "Link",
+      "required": false,
+      "read_only": false,
+      "hidden": false,
+      "value": "Website",
+      "link_doctype": "Lead Source",
+      "options": [
+        {
+          "label": "Website",
+          "value": "Website"
+        }
+      ]
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "required": false,
+      "read_only": false,
+      "hidden": false,
+      "value": "Lead",
+      "options": [
+        {
+          "label": "Lead",
+          "value": "Lead"
+        },
+        {
+          "label": "Opportunity",
+          "value": "Opportunity"
+        }
+      ]
+    }
+  ]
+}
+
+Notes:
+- The id field is excluded from form_fields in edit mode.
+- Select fields return options from DocField options.
+- Link fields return options from linked DocType records.
+
+
 1. Get Lead Details
 -------------------
 
@@ -75,7 +138,20 @@ Response:
 -----------------
 
 Method:
-GET /api/method/mobile_api.api.get_leads?limit_start=0&limit_page_length=20&status=Lead&search=CRM
+GET /api/method/mobile_api.api.get_leads?limit_start=0&limit_page_length=20&status=Lead&search=CRM&follow_up_filter=overdue&sort_by=overdue_first
+
+Supported follow_up_filter values:
+- overdue
+- today
+- this_week
+- month
+- never_contacted
+- upcoming
+
+Supported sort_by values:
+- next_follow_up_date_asc
+- overdue_first
+- never_contacted_first
 
 Response:
 
@@ -94,16 +170,60 @@ Response:
         "email": "ahmed@test.com",
         "mobile": "0500000000"
       },
+      "last_update_date": "2026-03-24",
+      "next_follow_up_date": "2026-03-30",
+      "last_follow_up_report": "Client contacted and waiting for reply",
+      "has_follow_up": true,
+      "is_overdue": false,
+      "is_due_today": false,
+      "is_due_this_week": true,
+      "is_due_this_month": true,
+      "never_contacted": false,
       "follow_up_summary": {
         "last_update_date": "2026-03-24",
         "next_follow_up_date": "2026-03-30",
-        "last_follow_up_report": "Client contacted and waiting for reply"
+        "last_follow_up_report": "Client contacted and waiting for reply",
+        "attachment": null,
+        "has_follow_up": true,
+        "is_overdue": false,
+        "is_due_today": false,
+        "is_due_this_week": true,
+        "is_due_this_month": true,
+        "never_contacted": false
       },
       "modified": "2026-03-24 10:31:00"
     }
   ],
+  "total_count": 1,
   "limit_start": 0,
   "limit_page_length": 20,
+  "filters": {
+    "status": "Lead",
+    "search": "CRM",
+    "follow_up_filter": "overdue",
+    "sort_by": "overdue_first"
+  }
+}
+
+
+2.1 Get Leads Dashboard Summary
+-------------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_leads_dashboard_summary?status=Lead&search=CRM
+
+Response:
+
+{
+  "status": "success",
+  "summary": {
+    "overdue_count": 5,
+    "today_count": 2,
+    "this_week_count": 7,
+    "month_count": 12,
+    "never_contacted_count": 4,
+    "upcoming_count": 9
+  },
   "filters": {
     "status": "Lead",
     "search": "CRM"
