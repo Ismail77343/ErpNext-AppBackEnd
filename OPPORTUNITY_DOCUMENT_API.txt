@@ -1,0 +1,499 @@
+Opportunity Document API
+========================
+
+This file explains the Opportunity API response structure for frontend developers.
+
+Important workflow note
+-----------------------
+
+- `status` is the business status of Opportunity, for example: `Open`, `Replied`, `Quotation`
+- `workflow_state` is the real workflow state, for example: `Pending for Sales Manager`
+- If frontend wants to show workflow badge or workflow label, it must use `workflow_state`
+- Do not use `status` as workflow state
+
+Automatic data behavior
+-----------------------
+
+When creating or updating Opportunity:
+- `title` is filled automatically from linked `Lead` or `Customer`
+- `customer_name` is filled automatically from linked `Lead` or `Customer`
+- contact fields are filled automatically when available
+- address fields are filled automatically from linked `Lead` or linked `Customer` address
+- API response `content` is generated automatically from opportunity data
+
+Examples:
+- From Lead:
+  uses `company_name` or `lead_name`
+  and also fills `city`, `state`, `country`, `address_line1`, `address_line2`
+- From Customer:
+  uses `customer_name`
+  and tries to read the latest linked `Address`
+
+
+0. Get Opportunity Form
+-----------------------
+
+Method:
+GET /api/method/mobile_api.api.get_opportunity_form
+
+For edit:
+GET /api/method/mobile_api.api.get_opportunity_form?opportunity_name=<OPPORTUNITY_ID>
+
+Response:
+
+{
+  "status": "success",
+  "mode": "edit",
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "default_values": {
+    "status": "Open"
+  },
+  "form_fields": [
+    {
+      "fieldname": "opportunity_from",
+      "label": "Opportunity From",
+      "fieldtype": "Link",
+      "required": true,
+      "read_only": false,
+      "hidden": false,
+      "value": "Lead",
+      "link_doctype": "DocType",
+      "options": [
+        {
+          "label": "Lead",
+          "value": "Lead"
+        }
+      ]
+    },
+    {
+      "fieldname": "party_name",
+      "label": "Party",
+      "fieldtype": "Dynamic Link",
+      "required": true,
+      "read_only": false,
+      "hidden": false,
+      "value": "CRM-LEAD-2026-00001",
+      "link_doctype_field": "opportunity_from",
+      "link_doctype": "Lead",
+      "options": [
+        {
+          "label": "CRM-LEAD-2026-00001",
+          "value": "CRM-LEAD-2026-00001"
+        }
+      ]
+    }
+  ]
+}
+
+Notes:
+- The id field is excluded from form_fields in edit mode.
+- Select fields return options from DocField options.
+- Link fields return options from linked DocType records.
+- Dynamic Link fields return options based on the current link_doctype_field value.
+
+
+1. Get Opportunity Details
+--------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_opportunity_details?opportunity_name=<OPPORTUNITY_ID>
+
+Response:
+
+{
+  "status": "success",
+  "data": {
+    "id": "CRM-OPP-2026-00001",
+    "doctype": "Opportunity",
+    "content": "Test Customer | Workflow: Pending for Sales Manager | Amount: 15000 | Next Follow Up: 2026-03-29",
+    "identity": {
+      "name": "CRM-OPP-2026-00001",
+      "display_name": "Test Customer",
+      "party_name": "CRM-LEAD-2026-00001",
+      "customer_name": "Test Customer",
+      "title": null
+    },
+    "status": {
+      "current": "Open",
+      "workflow_state": "Pending for Sales Manager",
+      "opportunity_from": "Lead",
+      "owner": "administrator@example.com",
+      "source": "Website",
+      "sales_stage": "Prospecting"
+    },
+    "value": {
+      "currency": "SAR",
+      "opportunity_amount": 15000,
+      "expected_closing": "2026-03-31",
+      "probability": 100
+    },
+    "contact": {
+      "contact_person": null,
+      "email": "test@example.com",
+      "mobile": "0500000000",
+      "whatsapp": null,
+      "phone": null
+    },
+    "address": {
+      "city": "Riyadh",
+      "state": null,
+      "country": "Saudi Arabia",
+      "territory": "All Territories"
+    },
+    "notes": null,
+    "last_update_date": "2026-03-25",
+    "next_follow_up_date": "2026-03-29",
+    "last_follow_up_report": "Waiting for quotation approval",
+    "has_follow_up": true,
+    "is_overdue": false,
+    "is_due_today": false,
+    "is_due_this_week": true,
+    "is_due_this_month": true,
+    "never_contacted": false,
+    "follow_up_summary": {
+      "last_update_date": "2026-03-25",
+      "next_follow_up_date": "2026-03-29",
+      "last_follow_up_report": "Waiting for quotation approval",
+      "attachment": null,
+      "has_follow_up": true,
+      "is_overdue": false,
+      "is_due_today": false,
+      "is_due_this_week": true,
+      "is_due_this_month": true,
+      "never_contacted": false
+    },
+    "follow_ups": [],
+    "activity_log": []
+  }
+}
+
+
+2. Get Opportunities List
+-------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_opportunities?limit_start=0&limit_page_length=20&status=Open&search=CRM&follow_up_filter=overdue&sort_by=overdue_first
+
+Supported follow_up_filter values:
+- overdue
+- today
+- this_week
+- month
+- never_contacted
+- upcoming
+
+Supported sort_by values:
+- next_follow_up_date_asc
+- overdue_first
+- never_contacted_first
+
+Response:
+
+{
+  "status": "success",
+  "data": [
+    {
+      "id": "CRM-OPP-2026-00001",
+      "doctype": "Opportunity",
+      "display_name": "Test Customer",
+      "content": "Test Customer | Workflow: Pending for Sales Manager | Amount: 15000 | Next Follow Up: 2026-03-29",
+      "party_name": "CRM-LEAD-2026-00001",
+      "customer_name": "Test Customer",
+      "status": "Open",
+      "workflow_state": "Pending for Sales Manager",
+      "opportunity_from": "Lead",
+      "opportunity_owner": "administrator@example.com",
+      "contact": {
+        "email": "test@example.com",
+        "mobile": "0500000000",
+        "phone": null
+      },
+      "last_update_date": "2026-03-25",
+      "next_follow_up_date": "2026-03-29",
+      "last_follow_up_report": "Waiting for quotation approval",
+      "has_follow_up": true,
+      "is_overdue": false,
+      "is_due_today": false,
+      "is_due_this_week": true,
+      "is_due_this_month": true,
+      "never_contacted": false,
+      "follow_up_summary": {
+        "last_update_date": "2026-03-25",
+        "next_follow_up_date": "2026-03-29",
+        "last_follow_up_report": "Waiting for quotation approval",
+        "attachment": null,
+        "has_follow_up": true,
+        "is_overdue": false,
+        "is_due_today": false,
+        "is_due_this_week": true,
+        "is_due_this_month": true,
+        "never_contacted": false
+      },
+      "modified": "2026-03-25 12:00:00"
+    }
+  ],
+  "total_count": 1,
+  "limit_start": 0,
+  "limit_page_length": 20,
+  "filters": {
+    "status": "Open",
+    "search": "CRM",
+    "follow_up_filter": "overdue",
+    "sort_by": "overdue_first"
+  }
+}
+
+
+2.1 Get Opportunities Dashboard Summary
+---------------------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_opportunities_dashboard_summary?status=Open&search=CRM
+
+Response:
+
+{
+  "status": "success",
+  "summary": {
+    "overdue_count": 0,
+    "today_count": 0,
+    "this_week_count": 1,
+    "month_count": 1,
+    "never_contacted_count": 0,
+    "upcoming_count": 1
+  },
+  "filters": {
+    "status": "Open",
+    "search": "CRM"
+  }
+}
+
+
+3. Get Opportunity Required Fields
+----------------------------------
+
+Method:
+POST /api/method/mobile_api.api.get_opportunity_required_fields
+
+Response:
+
+{
+  "status": "success",
+  "doctype": "Opportunity",
+  "opportunity_name": null,
+  "default_values": {
+    "status": "Open"
+  },
+  "required_fields": [],
+  "missing_fields": [],
+  "form_fields": []
+}
+
+
+4. Create Opportunity
+---------------------
+
+Method:
+POST /api/method/mobile_api.api.create_opportunity
+
+Request body:
+
+{
+  "data": {
+    "opportunity_from": "Lead",
+    "party_name": "CRM-LEAD-2026-00001",
+    "expected_closing": "2026-03-31"
+  }
+}
+
+On create, backend fills automatically:
+- `title`
+- `customer_name`
+- `contact_email`
+- `contact_mobile`
+- `phone`
+- `territory`
+- `city`
+- `state`
+- `country`
+- `address_line1`
+- `address_line2`
+- `address_display`
+- response `content`
+
+Success response:
+
+{
+  "status": "success",
+  "message": "تم إنشاء Opportunity بنجاح",
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "data": {
+    "id": "CRM-OPP-2026-00001",
+    "doctype": "Opportunity",
+    "content": "Test Customer | Workflow: Pending for Sales Manager | Amount: 15000 | Next Follow Up: 2026-03-29"
+  }
+}
+
+
+5. Update Opportunity
+---------------------
+
+Method:
+POST /api/method/mobile_api.api.update_opportunity
+
+Request body:
+
+{
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "data": {
+    "status": "Replied",
+    "expected_closing": "2026-04-05"
+  }
+}
+
+
+6. Add Opportunity Follow Up
+----------------------------
+
+Method:
+POST /api/method/mobile_api.api.add_opportunity_follow_up
+
+Request body:
+
+{
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "follow_up_date": "2026-03-25",
+  "expected_result_date": "2026-03-29",
+  "details": "Waiting for quotation approval",
+  "attachment": "/files/opportunity-follow.pdf"
+}
+
+
+7. Get Opportunity Workflow Actions
+-----------------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_opportunity_workflow_actions?opportunity_name=<OPPORTUNITY_ID>
+
+Response:
+
+{
+  "status": "success",
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "workflow_name": "Opportunity Approval Workflow",
+  "action_count": 2,
+  "actions": [
+    {
+      "action": "Approve",
+      "allowed": "Sales Manager",
+      "next_state": "Approved",
+      "state": "Pending Approval"
+    },
+    {
+      "action": "Reject",
+      "allowed": "Sales Manager",
+      "next_state": "Rejected",
+      "state": "Pending Approval"
+    }
+  ]
+}
+
+
+8. Execute Opportunity Workflow Action
+--------------------------------------
+
+Method:
+POST /api/method/mobile_api.api.execute_opportunity_workflow_action
+
+Request body:
+
+{
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "action": "Approve"
+}
+
+Response:
+
+{
+  "status": "success",
+  "message": "Workflow action Approve executed successfully",
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "workflow": {
+    "action_count": 1,
+    "actions": []
+  },
+  "data": {
+    "id": "CRM-OPP-2026-00001"
+  }
+}
+
+
+9. Send Opportunity For Approval
+--------------------------------
+
+Method:
+POST /api/method/mobile_api.api.send_opportunity_for_approval
+
+This is a convenience wrapper around execute workflow action.
+If `action` is not sent, backend tries to select the best matching send/approval action automatically.
+
+Request body:
+
+{
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "action": "Review"
+}
+
+
+10. Return Opportunity Workflow
+-------------------------------
+
+Method:
+POST /api/method/mobile_api.api.return_opportunity_workflow
+
+This is a convenience wrapper around execute workflow action.
+If `action` is not sent, backend tries to select the best matching return/reject action automatically.
+
+Request body:
+
+{
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "action": "Reject"
+}
+
+
+11. Get Opportunity Follow Ups
+------------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_opportunity_follow_ups?opportunity_name=<OPPORTUNITY_ID>
+
+Response:
+
+{
+  "status": "success",
+  "opportunity_name": "CRM-OPP-2026-00001",
+  "follow_ups": [
+    {
+      "id": "child-row-id",
+      "follow_up_date": "2026-03-25",
+      "expected_result_date": "2026-03-29",
+      "details": "Waiting for quotation approval",
+      "attachment": "/files/opportunity-follow.pdf",
+      "registered_on": "2026-03-25 12:00:00"
+    }
+  ]
+}
+
+
+Frontend Notes
+--------------
+
+- Always use data.id as the main opportunity identifier.
+- For edit form use get_opportunity_form.
+- For details screen use get_opportunity_details.
+- For follow-up timeline use get_opportunity_follow_ups.
+- Before create or update, frontend can call get_opportunity_required_fields.
+- In list endpoint `get_opportunities`, read workflow label from `item.workflow_state`
+- In details endpoint `get_opportunity_details`, read workflow label from `data.status.workflow_state`
+- `status` is not workflow state

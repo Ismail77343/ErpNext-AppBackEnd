@@ -16,22 +16,26 @@ mobile_api/
 ├── handlers/                       # طبقة معالجة الطلبات
 │   ├── auth_handler.py
 │   ├── lead_handler.py
+│   ├── opportunity_handler.py
 │   ├── project_handler.py
 │   ├── task_handler.py
 │   └── material_request_handler.py
 ├── services/                       # طبقة منطق العمل
 │   ├── auth_service.py
 │   ├── lead_service.py
+│   ├── opportunity_service.py
 │   ├── project_service.py
 │   ├── task_service.py
 │   └── material_request_service.py
 ├── repositories/                   # طبقة الوصول للبيانات
 │   ├── lead_repository.py
+│   ├── opportunity_repository.py
 │   ├── project_repository.py
 │   ├── task_repository.py
 │   └── material_request_repository.py
 └── utils/                          # أدوات مساعدة
     ├── lead_utils.py
+    ├── opportunity_utils.py
     └── task_utils.py
 ```
 
@@ -51,6 +55,23 @@ mobile_api/
 التوثيق التفصيلي:
 
 - `LEAD_API_DOCUMENTATION.md`
+- `LEAD_DOCUMENT_API.txt`
+
+## 🧩 Opportunity Module
+
+تم تجهيز `Opportunity` أيضًا بنفس النمط، ويشمل:
+
+- إنشاء Opportunity
+- تعديل Opportunity
+- قراءة الحقول الإلزامية ديناميكيًا
+- form fields جاهزة للواجهة
+- عرض قائمة الفرص
+- dashboard summary للمتابعات
+- إضافة Follow Up وعرضه
+
+التوثيق التفصيلي:
+
+- `OPPORTUNITY_DOCUMENT_API.txt`
 
 ---
 

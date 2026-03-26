@@ -31,6 +31,21 @@ from mobile_api.handlers.lead_handler import (
     update_lead,
     add_lead_follow_up,
 )
+from mobile_api.handlers.opportunity_handler import (
+    get_opportunity_workflow_actions,
+    execute_opportunity_workflow_action,
+    send_opportunity_for_approval,
+    return_opportunity_workflow,
+    get_opportunity_form,
+    get_opportunities,
+    get_opportunities_dashboard_summary,
+    get_opportunity_details,
+    get_opportunity_follow_ups,
+    get_opportunity_required_fields,
+    create_opportunity,
+    update_opportunity,
+    add_opportunity_follow_up,
+)
 from mobile_api.handlers.material_request_handler import (
     create_material_request
 )
@@ -54,5 +69,18 @@ __all__ = [
     'create_lead',
     'update_lead',
     'add_lead_follow_up',
+    'get_opportunity_workflow_actions',
+    'execute_opportunity_workflow_action',
+    'send_opportunity_for_approval',
+    'return_opportunity_workflow',
+    'get_opportunity_form',
+    'get_opportunities',
+    'get_opportunities_dashboard_summary',
+    'get_opportunity_details',
+    'get_opportunity_follow_ups',
+    'get_opportunity_required_fields',
+    'create_opportunity',
+    'update_opportunity',
+    'add_opportunity_follow_up',
     'create_material_request'
 ]
