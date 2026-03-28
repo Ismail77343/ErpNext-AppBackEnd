@@ -1,0 +1,128 @@
+Quotation Document API
+======================
+
+This file explains the Quotation API response structure for frontend developers.
+
+Important rules
+---------------
+
+- Quotation is read-only from mobile for base document data
+- Mobile can view quotation data, print it, follow it up, and run workflow actions
+- Mobile must not create Quotation
+- Mobile must not update Quotation fields directly
+
+Available endpoints
+-------------------
+
+1. List quotations
+GET /api/method/mobile_api.api.get_quotations
+
+Supported filters:
+- status
+- search
+- follow_up_filter = overdue | today | this_week | month | never_contacted | upcoming
+- sort_by = next_follow_up_date_asc | overdue_first | never_contacted_first
+
+Each row returns:
+- id
+- display_name
+- content
+- status
+- workflow_state
+- last_update_date
+- next_follow_up_date
+- last_follow_up_report
+- has_follow_up
+- is_overdue
+- is_due_today
+- is_due_this_week
+- is_due_this_month
+- never_contacted
+
+2. Dashboard summary
+GET /api/method/mobile_api.api.get_quotations_dashboard_summary
+
+Returns:
+- overdue_count
+- today_count
+- this_week_count
+- month_count
+- never_contacted_count
+- upcoming_count
+
+3. Quotation details
+GET /api/method/mobile_api.api.get_quotation_details?quotation_name=<QUOTATION_ID>
+
+Important frontend paths:
+- workflow badge: data.status.workflow_state
+- business status: data.status.current
+- print url: data.print.print_url
+- pdf url: data.print.pdf_url
+- available print formats: data.print.available_print_formats
+
+4. Quotation print data
+GET /api/method/mobile_api.api.get_quotation_print_data?quotation_name=<QUOTATION_ID>
+
+Optional:
+- print_format
+
+Response:
+- default_print_format
+- available_print_formats
+- print_url
+- pdf_url
+
+5. Quotation follow ups
+GET /api/method/mobile_api.api.get_quotation_follow_ups?quotation_name=<QUOTATION_ID>
+
+6. Add quotation follow up
+POST /api/method/mobile_api.api.add_quotation_follow_up
+
+Request body:
+- quotation_name
+- follow_up_date
+- expected_result_date
+- details
+- attachment (optional)
+
+7. Workflow actions
+GET /api/method/mobile_api.api.get_quotation_workflow_actions?quotation_name=<QUOTATION_ID>
+
+Returns:
+- workflow_name
+- action_count
+- actions
+
+8. Execute workflow action
+POST /api/method/mobile_api.api.execute_quotation_workflow_action
+
+Request body:
+- quotation_name
+- action
+
+9. Send for approval
+POST /api/method/mobile_api.api.send_quotation_for_approval
+
+Request body:
+- quotation_name
+- action (optional)
+
+If action is not sent, backend tries to choose the best matching approval action automatically.
+
+10. Return workflow
+POST /api/method/mobile_api.api.return_quotation_workflow
+
+Request body:
+- quotation_name
+- action (optional)
+
+If action is not sent, backend tries to choose the best matching return or reject action automatically.
+
+Frontend notes
+--------------
+
+- For list cards use get_quotations
+- For details screen use get_quotation_details
+- For print screen use data.print from details or get_quotation_print_data
+- For follow-up cards use dashboard summary and follow-up flags from list rows
+- For workflow button labels use get_quotation_workflow_actions

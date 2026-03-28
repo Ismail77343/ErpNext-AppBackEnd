@@ -46,6 +46,18 @@ from mobile_api.handlers.opportunity_handler import (
     update_opportunity,
     add_opportunity_follow_up,
 )
+from mobile_api.handlers.quotation_handler import (
+    get_quotations,
+    get_quotations_dashboard_summary,
+    get_quotation_details,
+    get_quotation_print_data,
+    get_quotation_follow_ups,
+    add_quotation_follow_up,
+    get_quotation_workflow_actions,
+    execute_quotation_workflow_action,
+    send_quotation_for_approval,
+    return_quotation_workflow,
+)
 from mobile_api.handlers.material_request_handler import (
     create_material_request
 )
@@ -82,5 +94,15 @@ __all__ = [
     'create_opportunity',
     'update_opportunity',
     'add_opportunity_follow_up',
+    'get_quotations',
+    'get_quotations_dashboard_summary',
+    'get_quotation_details',
+    'get_quotation_print_data',
+    'get_quotation_follow_ups',
+    'add_quotation_follow_up',
+    'get_quotation_workflow_actions',
+    'execute_quotation_workflow_action',
+    'send_quotation_for_approval',
+    'return_quotation_workflow',
     'create_material_request'
 ]
