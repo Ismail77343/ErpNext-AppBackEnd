@@ -58,6 +58,10 @@ from mobile_api.handlers.quotation_handler import (
     send_quotation_for_approval,
     return_quotation_workflow,
 )
+from mobile_api.handlers.notification_handler import (
+    get_workflow_notifications,
+    get_workflow_notifications_summary,
+)
 from mobile_api.handlers.material_request_handler import (
     create_material_request
 )
@@ -104,5 +108,7 @@ __all__ = [
     'execute_quotation_workflow_action',
     'send_quotation_for_approval',
     'return_quotation_workflow',
+    'get_workflow_notifications',
+    'get_workflow_notifications_summary',
     'create_material_request'
 ]

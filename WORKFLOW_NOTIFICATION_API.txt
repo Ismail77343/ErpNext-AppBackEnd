@@ -1,0 +1,178 @@
+Workflow Notification API
+=========================
+
+This file explains the workflow notification API for frontend developers.
+
+Purpose
+-------
+
+- Mobile app fetches workflow notifications for the current logged-in user
+- Notifications are taken from open workflow `ToDo` assignments
+- API works for all doctypes in the system that have workflow
+- Each notification includes:
+  - document basic info
+  - workflow state
+  - available actions
+  - direct document link
+  - optional mobile detail endpoint if supported
+
+
+1. Get Workflow Notifications
+-----------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_workflow_notifications
+
+Optional query params:
+- limit_start
+- limit_page_length
+
+Example:
+GET /api/method/mobile_api.api.get_workflow_notifications?limit_start=0&limit_page_length=20
+
+Response:
+
+{
+  "status": "success",
+  "user": "Administrator",
+  "data": [
+    {
+      "id": "TODO-00001",
+      "notification_type": "workflow_action",
+      "allocated_to": "Administrator",
+      "doctype": "Quotation",
+      "document_name": "SAL-QTN-2025-01301",
+      "display_name": "مؤسسة داري المتطورة",
+      "workflow_state": "Pending for Sales Manager",
+      "status": "Draft",
+      "priority": "Medium",
+      "todo_status": "Open",
+      "due_date": "2026-03-28",
+      "modified": "2026-03-28 10:30:00",
+      "message": "Workflow action pending for Quotation SAL-QTN-2025-01301",
+      "detail_endpoint": {
+        "method": "mobile_api.api.get_quotation_details",
+        "param_key": "quotation_name",
+        "param_value": "SAL-QTN-2025-01301"
+      },
+      "document_link": {
+        "doctype": "Quotation",
+        "docname": "SAL-QTN-2025-01301",
+        "route": ["Form", "Quotation", "SAL-QTN-2025-01301"],
+        "url": "http://tpg.com:8000/app/quotation/SAL-QTN-2025-01301"
+      },
+      "action_count": 2,
+      "actions": [
+        {
+          "action": "Approve",
+          "allowed": "Sales Manager",
+          "next_state": "Approved",
+          "state": "Pending for Sales Manager"
+        },
+        {
+          "action": "Reject",
+          "allowed": "Sales Manager",
+          "next_state": "Rejected",
+          "state": "Pending for Sales Manager"
+        }
+      ]
+    }
+  ],
+  "total_count": 1,
+  "unread_count": 1,
+  "limit_start": 0,
+  "limit_page_length": 20
+}
+
+
+2. Get Workflow Notification Summary
+------------------------------------
+
+Method:
+GET /api/method/mobile_api.api.get_workflow_notifications_summary
+
+Response:
+
+{
+  "status": "success",
+  "user": "Administrator",
+  "summary": {
+    "total_count": 4,
+    "unread_count": 4,
+    "opportunity_count": 1,
+    "quotation_count": 2,
+    "lead_count": 0,
+    "other_count": 1
+  }
+}
+
+
+Important Response Fields
+-------------------------
+
+- `doctype`
+  document type that has pending workflow action
+
+- `document_name`
+  actual document id
+
+- `display_name`
+  user-friendly title for the card
+
+- `workflow_state`
+  current workflow state shown in the UI
+
+- `status`
+  business status of the document if available
+
+- `message`
+  message text to show in the notification item
+
+- `actions`
+  available workflow actions for the current user
+
+- `detail_endpoint`
+  mobile API detail endpoint if this doctype has a dedicated mobile screen
+
+- `document_link`
+  generic document link for every workflow-enabled doctype in the system
+
+
+How Frontend Should Open The Document
+-------------------------------------
+
+Case 1:
+If `detail_endpoint` is not null
+- use `detail_endpoint.method`
+- send `detail_endpoint.param_key = detail_endpoint.param_value`
+- this is the preferred mobile-native way
+
+Case 2:
+If `detail_endpoint` is null
+- use `document_link.route`
+- or use `document_link.url`
+- this works for any workflow-enabled doctype in the system
+
+
+Current Dedicated Mobile Detail Endpoints
+-----------------------------------------
+
+- Lead
+  `mobile_api.api.get_lead_details`
+
+- Opportunity
+  `mobile_api.api.get_opportunity_details`
+
+- Quotation
+  `mobile_api.api.get_quotation_details`
+
+
+Frontend Notes
+--------------
+
+- Use `get_workflow_notifications` for the notification list
+- Use `get_workflow_notifications_summary` for badge count on bell icon
+- `unread_count` currently means open actionable workflow notifications
+- API is generic for all workflow doctypes
+- `detail_endpoint` may be null for doctypes that do not have a dedicated mobile API
+- `document_link` is always the fallback direct document link
