@@ -35,7 +35,10 @@ frappe.ui.form.on("Quotation", {
 
 function setup_mobile_api_follow_up(frm) {
     make_follow_table_read_only(frm);
-    sync_mobile_api_follow_up_summary(frm, false);
+    sync_mobile_api_follow_up_summary(frm, {
+        mark_dirty: false,
+        skip_dirty_trigger: true,
+    });
 
     if (frm.is_new()) {
         return;
@@ -84,7 +87,10 @@ function get_mobile_api_latest_follow_row(frm) {
     })[0];
 }
 
-function sync_mobile_api_follow_up_summary(frm, mark_dirty = true) {
+function sync_mobile_api_follow_up_summary(
+    frm,
+    { mark_dirty = true, skip_dirty_trigger = false } = {}
+) {
     const latestRow = get_mobile_api_latest_follow_row(frm);
     const values = {};
 
@@ -103,13 +109,14 @@ function sync_mobile_api_follow_up_summary(frm, mark_dirty = true) {
     });
 
     if (!hasChanges) {
-        return;
+        return Promise.resolve();
     }
 
-    frm.set_value(values);
-    if (mark_dirty) {
-        frm.dirty();
-    }
+    return frm.set_value(values, null, null, skip_dirty_trigger).then(() => {
+        if (mark_dirty) {
+            frm.dirty();
+        }
+    });
 }
 
 function open_follow_dialog(frm) {
@@ -142,13 +149,13 @@ function open_follow_dialog(frm) {
             },
         ],
         primary_action_label: __("Add"),
-        primary_action(values) {
+        async primary_action(values) {
             if (!values.follow_up_date || !values.expected_result_date || !values.details) {
                 frappe.msgprint(__("Please complete all required fields."));
                 return;
             }
 
-            const row = frm.add_child(MOBILE_API_FOLLOW_TABLE, {
+            frm.add_child(MOBILE_API_FOLLOW_TABLE, {
                 follow_up_date: values.follow_up_date,
                 expected_result_date: values.expected_result_date,
                 details: values.details,
@@ -157,15 +164,13 @@ function open_follow_dialog(frm) {
             });
 
             frm.refresh_field(MOBILE_API_FOLLOW_TABLE);
-            sync_mobile_api_follow_up_summary(frm);
-            frm.dirty();
+            await sync_mobile_api_follow_up_summary(frm);
             dialog.hide();
 
-            frm.save().then(() => {
-                frappe.show_alert({
-                    message: __("Follow up added"),
-                    indicator: "green",
-                });
+            await frm.save();
+            frappe.show_alert({
+                message: __("Follow up added"),
+                indicator: "green",
             });
         },
     });
