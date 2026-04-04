@@ -5,3 +5,4 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 mobile_api.patches.cleanup_crm_follow_up_fields
+mobile_api.patches.backfill_crm_follow_up_users

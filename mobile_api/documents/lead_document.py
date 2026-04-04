@@ -96,6 +96,7 @@ class LeadDocument:
             "expected_result_date": row.get("expected_result_date"),
             "details": row.get("details"),
             "attachment": row.get("attachment"),
+            "followed_by": row.get("followed_by"),
             "registered_on": row.get("registered_on"),
         }
 

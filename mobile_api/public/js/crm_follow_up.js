@@ -160,6 +160,7 @@ function open_follow_dialog(frm) {
                 expected_result_date: values.expected_result_date,
                 details: values.details,
                 attachment: values.attachment || "",
+                followed_by: frappe.session.user_fullname || frappe.session.user,
                 registered_on: frappe.datetime.now_datetime(),
             });
 

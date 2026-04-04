@@ -41,6 +41,7 @@ class CRMFollowUpService:
             "docname": docname,
             "follow_up_date": follow_up_date,
             "expected_result_date": expected_result_date,
+            "followed_by": CRMFollowUpRepository.get_follow_up_user(),
         }
 
     @staticmethod

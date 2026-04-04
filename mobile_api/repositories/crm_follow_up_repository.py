@@ -36,6 +36,14 @@ class CRMFollowUpRepository:
         )
 
     @staticmethod
+    def get_follow_up_user():
+        user = frappe.session.user
+        if not user or user == "Guest":
+            return None
+
+        return frappe.db.get_value("User", user, "full_name") or user
+
+    @staticmethod
     def append_follow_up(doc, follow_up_date, expected_result_date, details, attachment=None):
         if not hasattr(doc, FOLLOW_UP_TABLE_FIELD):
             frappe.throw("حقول المتابعة غير موجودة بعد. نفذ bench migrate أولاً.")
@@ -47,6 +55,7 @@ class CRMFollowUpRepository:
                 "expected_result_date": expected_result_date,
                 "details": details,
                 "attachment": attachment or "",
+                "followed_by": CRMFollowUpRepository.get_follow_up_user(),
                 "registered_on": frappe.utils.now(),
             },
         )
