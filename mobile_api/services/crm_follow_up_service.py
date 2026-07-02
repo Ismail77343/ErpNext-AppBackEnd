@@ -25,14 +25,23 @@ class CRMFollowUpService:
             }
 
         doc = CRMFollowUpRepository.get_document(doctype, docname)
-        CRMFollowUpRepository.append_follow_up(
-            doc,
-            follow_up_date=follow_up_date,
-            expected_result_date=expected_result_date,
-            details=details,
-            attachment=attachment,
-        )
-        CRMFollowUpRepository.save_document(doc)
+        if doc.doctype == "Sales Invoice" and doc.docstatus == 1:
+            CRMFollowUpRepository.insert_submitted_sales_invoice_follow_up(
+                doc,
+                follow_up_date=follow_up_date,
+                expected_result_date=expected_result_date,
+                details=details,
+                attachment=attachment,
+            )
+        else:
+            CRMFollowUpRepository.append_follow_up(
+                doc,
+                follow_up_date=follow_up_date,
+                expected_result_date=expected_result_date,
+                details=details,
+                attachment=attachment,
+            )
+            CRMFollowUpRepository.save_document(doc)
 
         return {
             "status": "success",

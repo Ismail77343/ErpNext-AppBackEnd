@@ -178,5 +178,79 @@
     "options": "Mobile CRM Follow Up",
     "read_only": 1,
     "name": "Quotation-mobile_api_follow_ups"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_follow_tab",
+    "fieldtype": "Tab Break",
+    "insert_after": "loyalty_redemption_cost_center",
+    "label": "Follow",
+    "name": "Sales Invoice-mobile_api_follow_tab"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_follow_up_section",
+    "fieldtype": "Section Break",
+    "insert_after": "mobile_api_follow_tab",
+    "label": "Mobile API Follow Up",
+    "name": "Sales Invoice-mobile_api_follow_up_section"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_last_update_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_follow_up_section",
+    "label": "Follow Date",
+    "allow_on_submit": 1,
+    "read_only": 1,
+    "name": "Sales Invoice-mobile_api_last_update_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_next_follow_up_date",
+    "fieldtype": "Date",
+    "insert_after": "mobile_api_last_update_date",
+    "label": "Next Follow",
+    "allow_on_submit": 1,
+    "read_only": 1,
+    "name": "Sales Invoice-mobile_api_next_follow_up_date"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_last_follow_up_report",
+    "fieldtype": "Small Text",
+    "insert_after": "mobile_api_next_follow_up_date",
+    "label": "Last Follow",
+    "allow_on_submit": 1,
+    "read_only": 1,
+    "name": "Sales Invoice-mobile_api_last_follow_up_report"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_follow_up_attachment",
+    "fieldtype": "Attach",
+    "insert_after": "mobile_api_last_follow_up_report",
+    "label": "Follow Up Attachment",
+    "allow_on_submit": 1,
+    "read_only": 1,
+    "name": "Sales Invoice-mobile_api_follow_up_attachment"
+  },
+  {
+    "doctype": "Custom Field",
+    "dt": "Sales Invoice",
+    "fieldname": "mobile_api_follow_ups",
+    "fieldtype": "Table",
+    "insert_after": "mobile_api_follow_up_attachment",
+    "label": "Follow Up History",
+    "options": "Mobile CRM Follow Up",
+    "allow_on_submit": 1,
+    "read_only": 1,
+    "name": "Sales Invoice-mobile_api_follow_ups"
   }
 ]

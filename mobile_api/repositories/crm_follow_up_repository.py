@@ -4,7 +4,7 @@ from mobile_api.utils.crm_follow_up_utils import FOLLOW_UP_TABLE_FIELD, sync_fol
 
 
 class CRMFollowUpRepository:
-    ALLOWED_DOCTYPES = {"Lead", "Opportunity", "Quotation"}
+    ALLOWED_DOCTYPES = {"Lead", "Opportunity", "Quotation", "Sales Invoice"}
 
     @classmethod
     def validate_doctype(cls, doctype):
@@ -60,6 +60,48 @@ class CRMFollowUpRepository:
             },
         )
         sync_follow_up_summary(doc)
+
+    @staticmethod
+    def insert_submitted_sales_invoice_follow_up(
+        doc, follow_up_date, expected_result_date, details, attachment=None
+    ):
+        if doc.doctype != "Sales Invoice" or doc.docstatus != 1:
+            frappe.throw("هذه العملية مخصصة لفواتير المبيعات المقدمة فقط.")
+
+        doc.check_permission("write")
+
+        next_idx = (frappe.db.count("Mobile CRM Follow Up", {"parent": doc.name}) or 0) + 1
+        row = frappe.get_doc(
+            {
+                "doctype": "Mobile CRM Follow Up",
+                "parent": doc.name,
+                "parenttype": doc.doctype,
+                "parentfield": FOLLOW_UP_TABLE_FIELD,
+                "idx": next_idx,
+                "follow_up_date": follow_up_date,
+                "expected_result_date": expected_result_date,
+                "details": details,
+                "attachment": attachment or "",
+                "followed_by": CRMFollowUpRepository.get_follow_up_user(),
+                "registered_on": frappe.utils.now(),
+            }
+        )
+        row.insert(ignore_permissions=True)
+
+        frappe.db.set_value(
+            doc.doctype,
+            doc.name,
+            {
+                "mobile_api_last_update_date": follow_up_date,
+                "mobile_api_next_follow_up_date": expected_result_date,
+                "mobile_api_last_follow_up_report": details,
+                "mobile_api_follow_up_attachment": attachment or "",
+                "last_follow": details,
+            },
+            update_modified=False,
+        )
+        frappe.db.commit()
+        return row
 
     @staticmethod
     def save_document(doc):

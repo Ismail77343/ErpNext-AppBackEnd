@@ -33,7 +33,17 @@ frappe.ui.form.on("Quotation", {
     },
 });
 
+frappe.ui.form.on("Sales Invoice", {
+    refresh(frm) {
+        setup_mobile_api_follow_up(frm);
+    },
+    mobile_api_follow_ups_remove(frm) {
+        sync_mobile_api_follow_up_summary(frm);
+    },
+});
+
 function setup_mobile_api_follow_up(frm) {
+    make_follow_summary_fields_read_only(frm);
     make_follow_table_read_only(frm);
     sync_mobile_api_follow_up_summary(frm, {
         mark_dirty: false,
@@ -46,6 +56,22 @@ function setup_mobile_api_follow_up(frm) {
 
     frm.add_custom_button(__("Add Follow"), () => {
         open_follow_dialog(frm);
+    });
+}
+
+function make_follow_summary_fields_read_only(frm) {
+    if (frm.doctype !== "Sales Invoice") {
+        return;
+    }
+
+    Object.keys(MOBILE_API_SUMMARY_FIELD_MAP).forEach((fieldname) => {
+        const field = frm.fields_dict[fieldname];
+        if (!field) {
+            return;
+        }
+
+        field.df.get_status = () => "Read";
+        frm.set_df_property(fieldname, "read_only", 1);
     });
 }
 
@@ -102,6 +128,10 @@ function sync_mobile_api_follow_up_summary(
         values[targetField] = latestRow ? (latestRow[sourceField] || null) : null;
     });
 
+    if (frm.doctype === "Sales Invoice" && latestRow && "last_follow" in frm.doc) {
+        values.last_follow = latestRow.details || null;
+    }
+
     const hasChanges = Object.entries(values).some(([fieldname, value]) => {
         const current = frm.doc[fieldname] ?? null;
         const next = value ?? null;
@@ -126,20 +156,20 @@ function open_follow_dialog(frm) {
             {
                 fieldtype: "Date",
                 fieldname: "follow_up_date",
-                label: __("Last Update Date"),
+                label: __("Follow Date"),
                 default: frappe.datetime.get_today(),
                 reqd: 1,
             },
             {
                 fieldtype: "Date",
                 fieldname: "expected_result_date",
-                label: __("Next Follow Up Date"),
+                label: __("Next Follow"),
                 reqd: 1,
             },
             {
                 fieldtype: "Small Text",
                 fieldname: "details",
-                label: __("Last Follow Up Report"),
+                label: __("Last Follow"),
                 reqd: 1,
             },
             {
@@ -152,6 +182,36 @@ function open_follow_dialog(frm) {
         async primary_action(values) {
             if (!values.follow_up_date || !values.expected_result_date || !values.details) {
                 frappe.msgprint(__("Please complete all required fields."));
+                return;
+            }
+
+            if (frm.doctype === "Sales Invoice" && frm.doc.docstatus === 1) {
+                dialog.disable_primary_action();
+                const response = await frappe.call({
+                    method: "mobile_api.handlers.crm_follow_up_handler.add_crm_follow_up",
+                    args: {
+                        doctype: frm.doctype,
+                        docname: frm.doc.name,
+                        follow_up_date: values.follow_up_date,
+                        expected_result_date: values.expected_result_date,
+                        details: values.details,
+                        attachment: values.attachment || "",
+                    },
+                });
+                const result = response.message || {};
+
+                if (result.status === "error") {
+                    dialog.enable_primary_action();
+                    frappe.msgprint(result.message || __("Unable to add follow up."));
+                    return;
+                }
+
+                dialog.hide();
+                await frm.reload_doc();
+                frappe.show_alert({
+                    message: __("Follow up added"),
+                    indicator: "green",
+                });
                 return;
             }
 

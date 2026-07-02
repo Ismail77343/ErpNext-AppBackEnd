@@ -54,12 +54,23 @@ class TaskService:
         
         task = TaskRepository.get_task(task_name)
         progress_value = TaskUtils.parse_progress(progress)
+
+        if progress_value >= 100 and not attachment:
+            return {
+                "status": "error",
+                "message": "Attachment is required when task progress reaches 100%"
+            }
         
         # إضافة الصف الجديد
         TaskRepository.add_follow_up_row(task, date_follow, time_follow, progress_value, follow_up, attachment)
         
         # تحديث الملخص والسجل
         task.progress = progress_value
+        if progress_value >= 100:
+            task.status = "Completed"
+            task.attached_to_complete_the_task = attachment
+            task.completed_on = frappe.utils.getdate(date_follow) if date_follow else frappe.utils.today()
+            task.completed_by = frappe.session.user
         task.last_update_summary = TaskUtils.generate_summary(progress_value, date_follow, time_follow, follow_up)
         task.log_follow = TaskUtils.generate_log_follow(task)
         

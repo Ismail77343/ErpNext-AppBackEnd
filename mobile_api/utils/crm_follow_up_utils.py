@@ -2,7 +2,8 @@ import frappe
 
 
 FOLLOW_UP_TABLE_FIELD = "mobile_api_follow_ups"
-SUPPORTED_DOCTYPES = ("Lead", "Opportunity", "Quotation")
+SUPPORTED_DOCTYPES = ("Lead", "Opportunity", "Quotation", "Sales Invoice")
+SALES_INVOICE_DOCTYPE = "Sales Invoice"
 SUMMARY_FIELD_MAP = {
     "mobile_api_last_update_date": "follow_up_date",
     "mobile_api_next_follow_up_date": "expected_result_date",
@@ -42,6 +43,9 @@ def sync_follow_up_summary(doc, method=None):
         if hasattr(doc, target_field):
             doc.set(target_field, latest_row.get(source_field))
 
+    if doc.doctype == SALES_INVOICE_DOCTYPE and hasattr(doc, "last_follow"):
+        doc.set("last_follow", latest_row.get("details"))
+
 
 def backfill_follow_up_summaries():
     for doctype in SUPPORTED_DOCTYPES:
@@ -55,6 +59,11 @@ def backfill_follow_up_summaries():
                 new_value = latest_row.get(source_field) if latest_row else None
                 if doc.get(target_field) != new_value:
                     updates[target_field] = new_value
+
+            if doctype == SALES_INVOICE_DOCTYPE and latest_row:
+                new_value = latest_row.get("details")
+                if doc.get("last_follow") != new_value:
+                    updates["last_follow"] = new_value
 
             if updates:
                 frappe.db.set_value(doctype, name, updates, update_modified=False)

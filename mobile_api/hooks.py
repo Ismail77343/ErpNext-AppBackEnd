@@ -31,6 +31,25 @@ fixtures = [
 					"Quotation-mobile_api_last_follow_up_report",
 					"Quotation-mobile_api_follow_up_attachment",
 					"Quotation-mobile_api_follow_ups",
+					"Sales Invoice-mobile_api_follow_tab",
+					"Sales Invoice-mobile_api_follow_up_section",
+					"Sales Invoice-mobile_api_last_update_date",
+					"Sales Invoice-mobile_api_next_follow_up_date",
+					"Sales Invoice-mobile_api_last_follow_up_report",
+					"Sales Invoice-mobile_api_follow_up_attachment",
+					"Sales Invoice-mobile_api_follow_ups",
+				),
+			]
+		],
+	},
+	{
+		"doctype": "Property Setter",
+		"filters": [
+			[
+				"name",
+				"in",
+				(
+					"Sales Invoice-last_follow-hidden",
 				),
 			]
 		],
@@ -41,6 +60,7 @@ doctype_js = {
 	"Lead": "public/js/crm_follow_up.js",
 	"Opportunity": "public/js/crm_follow_up.js",
 	"Quotation": "public/js/crm_follow_up.js",
+	"Sales Invoice": "public/js/crm_follow_up.js",
 }
 
 doc_events = {
@@ -51,6 +71,9 @@ doc_events = {
 		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
 	},
 	"Quotation": {
+		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
+	},
+	"Sales Invoice": {
 		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
 	},
 }
