@@ -20,12 +20,21 @@ class ProjectRepository:
 
     @staticmethod
     def _filter_projects(rows):
+        if ProjectRepository._can_view_all_projects():
+            return rows
         return MobileAccessControl.filter_user_related_rows(
             "Project",
             rows,
             user_fields=["project_manager"],
             sales_person_fields=["sales_person"],
         )
+
+    @staticmethod
+    def _can_view_all_projects():
+        if frappe.session.user == "Administrator":
+            return True
+        roles = set(frappe.get_roles(frappe.session.user))
+        return bool(roles.intersection({"System Manager", "Projects Manager", "Project Manager"}))
 
     @staticmethod
     def get_all_active_projects():
@@ -61,10 +70,18 @@ class ProjectRepository:
         Returns:
             list: قائمة المشاريع المطلوبة
         """
-        rows = frappe.get_list("Project", fields=ProjectRepository._project_fields())
-        filtered_rows = ProjectRepository._filter_projects(rows)
         limit_start = int(limit_start or 0)
         limit_page_length = int(limit_page_length or 20)
+        if ProjectRepository._can_view_all_projects():
+            return frappe.get_list(
+                "Project",
+                fields=ProjectRepository._project_fields(),
+                limit_start=limit_start,
+                limit_page_length=limit_page_length,
+            )
+
+        rows = frappe.get_list("Project", fields=ProjectRepository._project_fields())
+        filtered_rows = ProjectRepository._filter_projects(rows)
         return filtered_rows[limit_start:limit_start + limit_page_length]
 
     @staticmethod
@@ -76,12 +93,18 @@ class ProjectRepository:
         Returns:
             Document: وثيقة المشروع
         """
-        return MobileAccessControl.ensure_read_access(
-            "Project",
-            project_name,
-            user_fields=["project_manager"],
-            sales_person_fields=["sales_person"],
-        )
+        if not frappe.has_permission("Project", "read", project_name):
+            frappe.throw("Not permitted to read this Project", frappe.PermissionError)
+        if not ProjectRepository._can_view_all_projects():
+            row = frappe.db.get_value(
+                "Project",
+                project_name,
+                ProjectRepository._project_fields(),
+                as_dict=True,
+            )
+            if not ProjectRepository._filter_projects([row] if row else []):
+                frappe.throw("Not permitted to read this Project", frappe.PermissionError)
+        return frappe.get_doc("Project", project_name)
 
     @staticmethod
     def get_project_tasks(project_name):

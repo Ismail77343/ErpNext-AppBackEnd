@@ -39,12 +39,9 @@ class OpportunityRepository:
 
     @staticmethod
     def get_opportunity(opportunity_name):
-        return MobileAccessControl.ensure_read_access(
-            "Opportunity",
-            opportunity_name,
-            user_fields=OpportunityRepository.USER_FIELDS,
-            sales_person_fields=OpportunityRepository.SALES_PERSON_FIELDS,
-        )
+        if not frappe.has_permission("Opportunity", "read", opportunity_name):
+            frappe.throw("Not permitted to read this Opportunity", frappe.PermissionError)
+        return frappe.get_doc("Opportunity", opportunity_name)
 
     @classmethod
     def list_fields(cls):
@@ -73,7 +70,7 @@ class OpportunityRepository:
                 like_value,
             )
 
-        rows = frappe.get_list(
+        return frappe.get_list(
             "Opportunity",
             filters=opportunity_filters,
             or_filters=or_filters or None,
@@ -81,12 +78,6 @@ class OpportunityRepository:
             order_by="modified desc",
             limit_start=limit_start,
             limit_page_length=limit_page_length,
-        )
-        return MobileAccessControl.filter_user_related_rows(
-            "Opportunity",
-            rows,
-            user_fields=cls.USER_FIELDS,
-            sales_person_fields=cls.SALES_PERSON_FIELDS,
         )
 
     @classmethod
@@ -123,12 +114,8 @@ class OpportunityRepository:
     @staticmethod
     def save_opportunity(doc):
         if not doc.is_new():
-            MobileAccessControl.ensure_write_access(
-                "Opportunity",
-                doc.name,
-                user_fields=OpportunityRepository.USER_FIELDS,
-                sales_person_fields=OpportunityRepository.SALES_PERSON_FIELDS,
-            )
+            if not frappe.has_permission("Opportunity", "write", doc.name):
+                frappe.throw("Not permitted to update this Opportunity", frappe.PermissionError)
         doc.save()
         frappe.db.commit()
         return doc
