@@ -65,6 +65,12 @@ from mobile_api.handlers.notification_handler import (
 from mobile_api.handlers.material_request_handler import (
     create_material_request
 )
+from mobile_api.handlers.hr_attendance_handler import (
+    get_hr_attendance_context,
+    get_mobile_device_verification_status,
+    mobile_employee_checkin,
+    request_mobile_device_verification,
+)
 
 __all__ = [
     'login',
@@ -110,5 +116,9 @@ __all__ = [
     'return_quotation_workflow',
     'get_workflow_notifications',
     'get_workflow_notifications_summary',
-    'create_material_request'
+    'create_material_request',
+    'get_hr_attendance_context',
+    'get_mobile_device_verification_status',
+    'mobile_employee_checkin',
+    'request_mobile_device_verification',
 ]

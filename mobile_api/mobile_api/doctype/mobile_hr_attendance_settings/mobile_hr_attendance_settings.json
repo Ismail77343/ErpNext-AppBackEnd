@@ -1,0 +1,191 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-08-08 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "attendance_section",
+  "require_geo_location",
+  "enforce_geofence",
+  "allow_checkout_outside_geofence",
+  "allow_checkin_without_assignment",
+  "default_radius_meters",
+  "allow_manual_notes",
+  "shift_section",
+  "default_log_type",
+  "skip_auto_attendance",
+  "photo_section",
+  "require_checkin_photo",
+  "photo_required_for",
+  "max_photo_size_kb",
+  "device_verification_section",
+  "require_verified_mobile_device",
+  "allow_multiple_verified_devices",
+  "device_verification_approver_role",
+  "api_section",
+  "return_all_active_locations"
+ ],
+ "fields": [
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable Mobile HR Attendance"
+  },
+  {
+   "fieldname": "attendance_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance Rules"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_geo_location",
+   "fieldtype": "Check",
+   "label": "Require GPS Location"
+  },
+  {
+   "default": "1",
+   "fieldname": "enforce_geofence",
+   "fieldtype": "Check",
+   "label": "Enforce Geofence"
+  },
+  {
+   "default": "1",
+   "description": "Allow OUT checkins outside the assigned geofence and mark them as Skip Auto Attendance.",
+   "fieldname": "allow_checkout_outside_geofence",
+   "fieldtype": "Check",
+   "label": "Allow Checkout Outside Geofence"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_checkin_without_assignment",
+   "fieldtype": "Check",
+   "label": "Allow Checkin Without Assignment"
+  },
+  {
+   "default": "150",
+   "fieldname": "default_radius_meters",
+   "fieldtype": "Int",
+   "label": "Default Radius (Meters)"
+  },
+  {
+   "default": "1",
+   "fieldname": "allow_manual_notes",
+   "fieldtype": "Check",
+   "label": "Allow Manual Notes"
+  },
+  {
+   "fieldname": "shift_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Checkin"
+  },
+  {
+   "default": "IN",
+   "fieldname": "default_log_type",
+   "fieldtype": "Select",
+   "label": "Default Log Type",
+   "options": "IN\nOUT"
+  },
+  {
+   "default": "0",
+   "fieldname": "skip_auto_attendance",
+   "fieldtype": "Check",
+   "label": "Skip Auto Attendance"
+  },
+  {
+   "fieldname": "photo_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance Photo"
+  },
+  {
+   "default": "0",
+   "description": "Require the mobile app to upload a camera photo before creating Employee Checkin.",
+   "fieldname": "require_checkin_photo",
+   "fieldtype": "Check",
+   "label": "Require Checkin Photo"
+  },
+  {
+   "default": "IN and OUT",
+   "depends_on": "eval:doc.require_checkin_photo",
+   "fieldname": "photo_required_for",
+   "fieldtype": "Select",
+   "label": "Photo Required For",
+   "options": "IN and OUT\nIN Only\nOUT Only\nOptional"
+  },
+  {
+   "default": "2048",
+   "description": "Maximum allowed photo upload size in KB.",
+   "fieldname": "max_photo_size_kb",
+   "fieldtype": "Int",
+   "label": "Max Photo Size (KB)"
+  },
+  {
+   "fieldname": "device_verification_section",
+   "fieldtype": "Section Break",
+   "label": "Mobile Device Verification"
+  },
+  {
+   "default": "0",
+   "description": "Require an approved mobile device verification request before creating mobile Employee Checkin records.",
+   "fieldname": "require_verified_mobile_device",
+   "fieldtype": "Check",
+   "label": "Require Verified Mobile Device"
+  },
+  {
+   "default": "0",
+   "description": "Allow more than one approved mobile device for the same employee.",
+   "fieldname": "allow_multiple_verified_devices",
+   "fieldtype": "Check",
+   "label": "Allow Multiple Verified Devices"
+  },
+  {
+   "default": "HR Manager",
+   "fieldname": "device_verification_approver_role",
+   "fieldtype": "Link",
+   "label": "Device Verification Approver Role",
+   "options": "Role"
+  },
+  {
+   "fieldname": "api_section",
+   "fieldtype": "Section Break",
+   "label": "Mobile API"
+  },
+  {
+   "default": "0",
+   "fieldname": "return_all_active_locations",
+   "fieldtype": "Check",
+   "label": "Return All Active Locations to Mobile"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mobile Api",
+ "name": "Mobile HR Attendance Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "HR Manager"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

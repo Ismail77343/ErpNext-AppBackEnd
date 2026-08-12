@@ -61,6 +61,7 @@ doctype_js = {
 	"Opportunity": "public/js/crm_follow_up.js",
 	"Quotation": "public/js/crm_follow_up.js",
 	"Sales Invoice": "public/js/crm_follow_up.js",
+	"Mobile HR Attendance Location": "public/js/mobile_hr_attendance_location.js",
 }
 
 doc_events = {

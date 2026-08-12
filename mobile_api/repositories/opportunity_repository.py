@@ -2,6 +2,7 @@ import frappe
 from frappe.model.workflow import apply_workflow, get_transitions, get_workflow_name
 
 from mobile_api.repositories.crm_follow_up_repository import CRMFollowUpRepository
+from mobile_api.utils.access_control import MobileAccessControl
 
 
 class OpportunityRepository:
@@ -24,8 +25,13 @@ class OpportunityRepository:
         "mobile_api_last_update_date",
         "mobile_api_next_follow_up_date",
         "mobile_api_last_follow_up_report",
+        "sales_person",
+        "owner",
+        "_assign",
         "modified",
     ]
+    USER_FIELDS = ["opportunity_owner"]
+    SALES_PERSON_FIELDS = ["sales_person"]
 
     @staticmethod
     def new_opportunity():
@@ -33,7 +39,16 @@ class OpportunityRepository:
 
     @staticmethod
     def get_opportunity(opportunity_name):
-        return frappe.get_doc("Opportunity", opportunity_name)
+        return MobileAccessControl.ensure_read_access(
+            "Opportunity",
+            opportunity_name,
+            user_fields=OpportunityRepository.USER_FIELDS,
+            sales_person_fields=OpportunityRepository.SALES_PERSON_FIELDS,
+        )
+
+    @classmethod
+    def list_fields(cls):
+        return MobileAccessControl.existing_fields("Opportunity", cls.LIST_FIELDS)
 
     @staticmethod
     def get_party_doc(party_type, party_name):
@@ -52,23 +67,26 @@ class OpportunityRepository:
 
         if search:
             like_value = f"%{search}%"
-            or_filters = [
-                ["Opportunity", "name", "like", like_value],
-                ["Opportunity", "title", "like", like_value],
-                ["Opportunity", "party_name", "like", like_value],
-                ["Opportunity", "customer_name", "like", like_value],
-                ["Opportunity", "contact_mobile", "like", like_value],
-                ["Opportunity", "contact_email", "like", like_value],
-            ]
+            or_filters = MobileAccessControl.search_or_filters(
+                "Opportunity",
+                ["name", "title", "party_name", "customer_name", "contact_mobile", "contact_email"],
+                like_value,
+            )
 
-        return frappe.get_all(
+        rows = frappe.get_list(
             "Opportunity",
             filters=opportunity_filters,
             or_filters=or_filters or None,
-            fields=cls.LIST_FIELDS,
+            fields=cls.list_fields(),
             order_by="modified desc",
             limit_start=limit_start,
             limit_page_length=limit_page_length,
+        )
+        return MobileAccessControl.filter_user_related_rows(
+            "Opportunity",
+            rows,
+            user_fields=cls.USER_FIELDS,
+            sales_person_fields=cls.SALES_PERSON_FIELDS,
         )
 
     @classmethod
@@ -104,6 +122,13 @@ class OpportunityRepository:
 
     @staticmethod
     def save_opportunity(doc):
+        if not doc.is_new():
+            MobileAccessControl.ensure_write_access(
+                "Opportunity",
+                doc.name,
+                user_fields=OpportunityRepository.USER_FIELDS,
+                sales_person_fields=OpportunityRepository.SALES_PERSON_FIELDS,
+            )
         doc.save()
         frappe.db.commit()
         return doc

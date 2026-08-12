@@ -1,6 +1,7 @@
 import frappe
 
 from mobile_api.repositories.crm_follow_up_repository import CRMFollowUpRepository
+from mobile_api.utils.access_control import MobileAccessControl
 
 
 class LeadRepository:
@@ -16,8 +17,11 @@ class LeadRepository:
         "mobile_api_last_update_date",
         "mobile_api_next_follow_up_date",
         "mobile_api_last_follow_up_report",
+        "owner",
+        "_assign",
         "modified",
     ]
+    USER_FIELDS = ["lead_owner"]
 
     @staticmethod
     def new_lead():
@@ -25,7 +29,11 @@ class LeadRepository:
 
     @staticmethod
     def get_lead(lead_name):
-        return frappe.get_doc("Lead", lead_name)
+        return MobileAccessControl.ensure_read_access("Lead", lead_name, user_fields=LeadRepository.USER_FIELDS)
+
+    @classmethod
+    def list_fields(cls):
+        return MobileAccessControl.existing_fields("Lead", cls.LIST_FIELDS)
 
     @classmethod
     def query_leads(cls, filters=None, search=None, limit_start=None, limit_page_length=None):
@@ -34,23 +42,22 @@ class LeadRepository:
 
         if search:
             like_value = f"%{search}%"
-            or_filters = [
-                ["Lead", "name", "like", like_value],
-                ["Lead", "lead_name", "like", like_value],
-                ["Lead", "company_name", "like", like_value],
-                ["Lead", "mobile_no", "like", like_value],
-                ["Lead", "email_id", "like", like_value],
-            ]
+            or_filters = MobileAccessControl.search_or_filters(
+                "Lead",
+                ["name", "lead_name", "company_name", "mobile_no", "email_id"],
+                like_value,
+            )
 
-        return frappe.get_all(
+        rows = frappe.get_list(
             "Lead",
             filters=lead_filters,
             or_filters=or_filters or None,
-            fields=cls.LIST_FIELDS,
+            fields=cls.list_fields(),
             order_by="modified desc",
             limit_start=limit_start,
             limit_page_length=limit_page_length,
         )
+        return MobileAccessControl.filter_user_related_rows("Lead", rows, user_fields=cls.USER_FIELDS)
 
     @classmethod
     def get_leads(cls, filters=None, search=None, limit_start=0, limit_page_length=20):
@@ -85,6 +92,8 @@ class LeadRepository:
 
     @staticmethod
     def save_lead(doc):
+        if not doc.is_new():
+            MobileAccessControl.ensure_write_access("Lead", doc.name, user_fields=LeadRepository.USER_FIELDS)
         doc.save()
         frappe.db.commit()
         return doc

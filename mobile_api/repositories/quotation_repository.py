@@ -2,6 +2,7 @@ import frappe
 from frappe.model.workflow import apply_workflow, get_transitions, get_workflow_name
 
 from mobile_api.repositories.crm_follow_up_repository import CRMFollowUpRepository
+from mobile_api.utils.access_control import MobileAccessControl
 
 
 class QuotationRepository:
@@ -22,12 +23,24 @@ class QuotationRepository:
         "mobile_api_last_update_date",
         "mobile_api_next_follow_up_date",
         "mobile_api_last_follow_up_report",
+        "sales_person",
+        "owner",
+        "_assign",
         "modified",
     ]
+    SALES_PERSON_FIELDS = ["sales_person"]
 
     @staticmethod
     def get_quotation(quotation_name):
-        return frappe.get_doc("Quotation", quotation_name)
+        return MobileAccessControl.ensure_read_access(
+            "Quotation",
+            quotation_name,
+            sales_person_fields=QuotationRepository.SALES_PERSON_FIELDS,
+        )
+
+    @classmethod
+    def list_fields(cls):
+        return MobileAccessControl.existing_fields("Quotation", cls.LIST_FIELDS)
 
     @classmethod
     def query_quotations(cls, filters=None, search=None, limit_start=None, limit_page_length=None):
@@ -36,22 +49,25 @@ class QuotationRepository:
 
         if search:
             like_value = f"%{search}%"
-            or_filters = [
-                ["Quotation", "name", "like", like_value],
-                ["Quotation", "customer_name", "like", like_value],
-                ["Quotation", "party_name", "like", like_value],
-                ["Quotation", "contact_mobile", "like", like_value],
-                ["Quotation", "contact_email", "like", like_value],
-            ]
+            or_filters = MobileAccessControl.search_or_filters(
+                "Quotation",
+                ["name", "customer_name", "party_name", "contact_mobile", "contact_email"],
+                like_value,
+            )
 
-        return frappe.get_all(
+        rows = frappe.get_list(
             "Quotation",
             filters=quotation_filters,
             or_filters=or_filters or None,
-            fields=cls.LIST_FIELDS,
+            fields=cls.list_fields(),
             order_by="modified desc",
             limit_start=limit_start,
             limit_page_length=limit_page_length,
+        )
+        return MobileAccessControl.filter_user_related_rows(
+            "Quotation",
+            rows,
+            sales_person_fields=cls.SALES_PERSON_FIELDS,
         )
 
     @staticmethod
@@ -78,6 +94,12 @@ class QuotationRepository:
 
     @staticmethod
     def save_quotation(doc):
+        if not doc.is_new():
+            MobileAccessControl.ensure_write_access(
+                "Quotation",
+                doc.name,
+                sales_person_fields=QuotationRepository.SALES_PERSON_FIELDS,
+            )
         doc.save()
         frappe.db.commit()
         return doc
