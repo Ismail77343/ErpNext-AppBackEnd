@@ -181,6 +181,17 @@
   },
   {
     "doctype": "Custom Field",
+    "dt": "Project",
+    "fieldname": "mobile_api_attendance_location",
+    "fieldtype": "Link",
+    "in_standard_filter": 1,
+    "insert_after": "is_active",
+    "label": "Mobile Attendance Location",
+    "name": "Project-mobile_api_attendance_location",
+    "options": "Mobile HR Attendance Location"
+  },
+  {
+    "doctype": "Custom Field",
     "dt": "Sales Invoice",
     "fieldname": "mobile_api_follow_tab",
     "fieldtype": "Tab Break",

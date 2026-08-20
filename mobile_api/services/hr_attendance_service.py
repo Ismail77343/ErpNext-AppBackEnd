@@ -58,6 +58,8 @@ class HRAttendanceService:
 			"employee": employee,
 			"settings": {
 				"require_geo_location": bool(settings.get("require_geo_location")),
+				"require_attendance_location_selection": bool(settings.get("require_attendance_location_selection")),
+				"require_project_attendance_location": bool(settings.get("require_project_attendance_location")),
 				"enforce_geofence": bool(settings.get("enforce_geofence")),
 				"allow_checkout_outside_geofence": bool(settings.get("allow_checkout_outside_geofence")),
 				"allow_checkin_without_assignment": bool(settings.get("allow_checkin_without_assignment")),
@@ -253,6 +255,10 @@ class HRAttendanceService:
 			return []
 
 		location_names = set()
+		project_location = cls._get_project_attendance_location(project)
+		if project_location:
+			location_names.add(project_location)
+
 		assignment_filters = {
 			"enabled": 1,
 			"attendance_location": ["is", "set"],
@@ -306,6 +312,12 @@ class HRAttendanceService:
 			order_by="location_name asc",
 		)
 		return [dict(row) for row in locations]
+
+	@staticmethod
+	def _get_project_attendance_location(project):
+		if not project or not frappe.get_meta("Project").has_field("mobile_api_attendance_location"):
+			return None
+		return frappe.db.get_value("Project", project, "mobile_api_attendance_location")
 
 	@staticmethod
 	def _assignment_is_current(assignment):
@@ -392,6 +404,13 @@ class HRAttendanceService:
 		latitude = cls._to_float(latitude, "Latitude") if latitude is not None else None
 		longitude = cls._to_float(longitude, "Longitude") if longitude is not None else None
 		allowed_locations = cls.get_allowed_locations(employee, settings, project=project)
+
+		if settings.get("require_attendance_location_selection") and not attendance_location:
+			cls._raise_mobile_error(
+				"Attendance location selection is required for mobile attendance.",
+				"ATTENDANCE_LOCATION_REQUIRED",
+			)
+
 		selected_location = cls._select_location(attendance_location, allowed_locations, latitude, longitude)
 
 		if not selected_location and not settings.get("allow_checkin_without_assignment"):

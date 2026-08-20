@@ -9,6 +9,8 @@
   "enabled",
   "attendance_section",
   "require_geo_location",
+  "require_attendance_location_selection",
+  "require_project_attendance_location",
   "enforce_geofence",
   "allow_checkout_outside_geofence",
   "allow_checkin_without_assignment",
@@ -45,6 +47,20 @@
    "fieldname": "require_geo_location",
    "fieldtype": "Check",
    "label": "Require GPS Location"
+  },
+  {
+   "default": "0",
+   "description": "Require the mobile app user to select an attendance location instead of letting the backend choose the nearest allowed location.",
+   "fieldname": "require_attendance_location_selection",
+   "fieldtype": "Check",
+   "label": "Require Attendance Location Selection"
+  },
+  {
+   "default": "0",
+   "description": "Require open and active projects to have a linked Mobile HR Attendance Location.",
+   "fieldname": "require_project_attendance_location",
+   "fieldtype": "Check",
+   "label": "Require Attendance Location for Open Projects"
   },
   {
    "default": "1",

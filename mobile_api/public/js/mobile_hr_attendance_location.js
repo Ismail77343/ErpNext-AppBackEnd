@@ -66,19 +66,20 @@ function show_location_picker(frm) {
 	let circle = null;
 
 	const dialog = new frappe.ui.Dialog({
-		title: __("Select Attendance Location"),
-		size: "extra-large",
+		title: __("Pick Location"),
+		size: "large",
 		fields: [
 			{
 				fieldname: "map_area",
 				fieldtype: "HTML",
 				options: `
-					<div class="mobile-hr-location-tools" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px;">
+					<div class="mobile-hr-location-picker-map" style="height: 520px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-light-gray);"></div>
+					<div class="text-muted small mt-2">${__("Click on the map or drag the marker to set the location.")}</div>
+					<div class="mobile-hr-location-map-status text-muted small mt-1"></div>
+					<div class="mobile-hr-location-tools" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px;">
 						<button class="btn btn-xs btn-default" data-action="current">${__("Use Current Location")}</button>
 						<button class="btn btn-xs btn-default" data-action="existing">${__("Center on Saved Location")}</button>
-						<span class="text-muted small">${__("Click the map or drag the marker. The circle shows the allowed attendance radius.")}</span>
-					</div>
-					<div class="mobile-hr-location-picker-map" style="height:520px; border:1px solid var(--border-color); border-radius:8px; overflow:hidden;"></div>`,
+					</div>`,
 			},
 			{
 				fieldname: "radius_meters",
@@ -114,37 +115,67 @@ function show_location_picker(frm) {
 	dialog.show();
 	dialog.set_value("radius_meters", selected_radius);
 	set_dialog_coordinates(dialog, selected, selected_radius);
+	show_map_status(dialog, __("Loading map..."));
 
-	load_leaflet().then(() => {
+	load_leaflet()
+		.then(() => {
+			setTimeout(initialize_map, 200);
+		})
+		.catch((error) => {
+			console.error("Unable to load Leaflet for attendance location picker", error);
+			show_map_status(
+				dialog,
+				__("Map library could not be loaded. Check that Frappe assets are available, then refresh the page."),
+				"red"
+			);
+			frappe.msgprint(__("Map library could not be loaded. Refresh the page and try again."));
+		});
+
+	function initialize_map() {
 		const wrapper = dialog.$wrapper.find(".mobile-hr-location-picker-map").get(0);
-		if (!wrapper || typeof L === "undefined") {
-			frappe.msgprint(__("Map library is not loaded. Refresh the page and try again."));
+		if (!wrapper || typeof window.L === "undefined") {
+			show_map_status(dialog, __("Map library is not loaded. Refresh the page and try again."), "red");
 			return;
 		}
-		wrapper.innerHTML = "";
-		wrapper.classList.add("leaflet-container");
 
+		const L = window.L;
 		const map_defaults = get_map_defaults();
-		if (map_defaults.image_path) {
-			L.Icon.Default.imagePath = map_defaults.image_path;
-		}
 
 		map = L.map(wrapper, { zoomControl: true }).setView(
 			[start.latitude, start.longitude],
 			current ? 16 : map_defaults.zoom
 		);
+		map.attributionControl.setPrefix("");
 
 		const tile_layer = L.tileLayer(map_defaults.tiles, map_defaults.options).addTo(map);
 		tile_layer.on("tileerror", () => {
 			if (map.__mobile_hr_used_fallback_tiles) return;
 			map.__mobile_hr_used_fallback_tiles = true;
+			show_map_status(
+				dialog,
+				__("Configured map tiles did not load. Trying the default OpenStreetMap tiles..."),
+				"orange"
+			);
 			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 				maxZoom: 19,
 				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-			}).addTo(map);
+			})
+				.on("load", () => show_map_status(dialog, ""))
+				.on("tileerror", () => {
+					show_map_status(
+						dialog,
+						__("Map tiles are blocked or unreachable from this browser/network."),
+						"red"
+					);
+				})
+				.addTo(map);
 		});
+		tile_layer.on("load", () => show_map_status(dialog, ""));
 
-		marker = L.marker([start.latitude, start.longitude], { draggable: true }).addTo(map);
+		marker = L.marker([start.latitude, start.longitude], {
+			draggable: true,
+			icon: get_leaflet_marker_icon(L),
+		}).addTo(map);
 		circle = L.circle([start.latitude, start.longitude], {
 			radius: selected_radius,
 			color: "#1f8ef1",
@@ -179,17 +210,33 @@ function show_location_picker(frm) {
 			read_browser_location((point) => apply_point({ lat: point.latitude, lng: point.longitude }, true));
 		});
 
-		setTimeout(() => {
-			map.invalidateSize();
-			map.setView([selected.latitude, selected.longitude], current ? 16 : map_defaults.zoom);
-		}, 500);
-	});
+		invalidate_map_size(map);
+	}
 
 	function refresh_circle() {
 		if (!circle) return;
 		circle.setLatLng([selected.latitude, selected.longitude]);
 		circle.setRadius(selected_radius);
 	}
+}
+
+function show_map_status(dialog, message, indicator) {
+	const $status = dialog.$wrapper.find(".mobile-hr-location-map-status");
+	if (!$status.length) return;
+
+	$status
+		.toggleClass("text-danger", indicator === "red")
+		.toggleClass("text-warning", indicator === "orange")
+		.toggleClass("text-muted", !indicator)
+		.text(message || "");
+}
+
+function invalidate_map_size(map) {
+	window.requestAnimationFrame(() => {
+		map.invalidateSize();
+		setTimeout(() => map.invalidateSize(), 250);
+		setTimeout(() => map.invalidateSize(), 750);
+	});
 }
 
 function use_current_location(frm) {
@@ -314,29 +361,54 @@ async function set_location_values(frm, values) {
 	}
 }
 
+let mobile_hr_leaflet_loading = null;
+
 function load_leaflet() {
 	ensure_stylesheet("/assets/frappe/js/lib/leaflet/leaflet.css");
 
-	return new Promise((resolve, reject) => {
-		if (typeof L !== "undefined") {
-			setTimeout(resolve, 100);
-			return;
-		}
+	if (typeof window.L !== "undefined") {
+		return Promise.resolve();
+	}
 
-		if (frappe.require) {
-			frappe.require(
-				["assets/frappe/js/lib/leaflet/leaflet.css", "assets/frappe/js/lib/leaflet/leaflet.js"],
-				() => setTimeout(resolve, 100)
-			);
+	if (mobile_hr_leaflet_loading) {
+		return mobile_hr_leaflet_loading;
+	}
+
+	mobile_hr_leaflet_loading = new Promise((resolve, reject) => {
+		const existing_script = Array.from(document.querySelectorAll("script[src]")).find((script) =>
+			(script.getAttribute("src") || "").includes("/assets/frappe/js/lib/leaflet/leaflet.js")
+		);
+
+		const resolve_when_ready = () => {
+			setTimeout(() => {
+				if (typeof window.L !== "undefined") {
+					resolve();
+				} else {
+					reject(new Error("Leaflet script loaded but window.L is unavailable"));
+				}
+			}, 100);
+		};
+
+		if (existing_script) {
+			existing_script.addEventListener("load", resolve_when_ready, { once: true });
+			existing_script.addEventListener("error", reject, { once: true });
+			setTimeout(resolve_when_ready, 100);
 			return;
 		}
 
 		const script = document.createElement("script");
 		script.src = "/assets/frappe/js/lib/leaflet/leaflet.js";
-		script.onload = () => setTimeout(resolve, 100);
-		script.onerror = reject;
+		script.async = true;
+		script.onload = resolve_when_ready;
+		script.onerror = () => reject(new Error("Unable to load /assets/frappe/js/lib/leaflet/leaflet.js"));
 		document.head.appendChild(script);
 	});
+
+	mobile_hr_leaflet_loading.catch(() => {
+		mobile_hr_leaflet_loading = null;
+	});
+
+	return mobile_hr_leaflet_loading;
 }
 
 function ensure_stylesheet(href) {
@@ -349,6 +421,33 @@ function ensure_stylesheet(href) {
 	link.rel = "stylesheet";
 	link.href = href;
 	document.head.appendChild(link);
+}
+
+function get_leaflet_marker_icon(L) {
+	return L.divIcon({
+		className: "mobile-hr-location-marker",
+		iconSize: [28, 40],
+		iconAnchor: [14, 40],
+		popupAnchor: [0, -36],
+		html: `
+			<div style="
+				width: 28px;
+				height: 28px;
+				background: #1683e8;
+				border: 2px solid #ffffff;
+				border-radius: 50% 50% 50% 0;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+				transform: rotate(-45deg);
+			">
+				<div style="
+					width: 8px;
+					height: 8px;
+					margin: 8px;
+					background: #ffffff;
+					border-radius: 50%;
+				"></div>
+			</div>`,
+	});
 }
 
 function get_map_defaults() {

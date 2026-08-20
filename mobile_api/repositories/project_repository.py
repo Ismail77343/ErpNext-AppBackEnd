@@ -16,6 +16,8 @@ class ProjectRepository:
             fields.append("project_manager")
         if meta.has_field("sales_person"):
             fields.append("sales_person")
+        if meta.has_field("mobile_api_attendance_location"):
+            fields.append("mobile_api_attendance_location")
         return fields
 
     @staticmethod

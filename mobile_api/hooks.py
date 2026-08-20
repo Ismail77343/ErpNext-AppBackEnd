@@ -38,6 +38,7 @@ fixtures = [
 					"Sales Invoice-mobile_api_last_follow_up_report",
 					"Sales Invoice-mobile_api_follow_up_attachment",
 					"Sales Invoice-mobile_api_follow_ups",
+					"Project-mobile_api_attendance_location",
 				),
 			]
 		],
@@ -76,6 +77,9 @@ doc_events = {
 	},
 	"Sales Invoice": {
 		"validate": "mobile_api.utils.crm_follow_up_utils.sync_follow_up_summary"
+	},
+	"Project": {
+		"validate": "mobile_api.utils.project_attendance_location.validate_project_attendance_location"
 	},
 }
 

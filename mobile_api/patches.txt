@@ -8,3 +8,4 @@ mobile_api.patches.cleanup_crm_follow_up_fields
 mobile_api.patches.backfill_crm_follow_up_users
 mobile_api.patches.setup_hr_attendance
 mobile_api.patches.add_hr_attendance_photo
+mobile_api.patches.setup_project_attendance_location
