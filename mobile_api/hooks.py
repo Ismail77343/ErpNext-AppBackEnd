@@ -63,6 +63,7 @@ doctype_js = {
 	"Quotation": "public/js/crm_follow_up.js",
 	"Sales Invoice": "public/js/crm_follow_up.js",
 	"Mobile HR Attendance Location": "public/js/mobile_hr_attendance_location.js",
+	"Stock Entry": "public/js/material_transfer_handover_stock_entry.js",
 }
 
 doc_events = {
@@ -80,6 +81,24 @@ doc_events = {
 	},
 	"Project": {
 		"validate": "mobile_api.utils.project_attendance_location.validate_project_attendance_location"
+	},
+	"Project Daily Timesheet Batch": {
+		"on_submit": "mobile_api.utils.mobile_task_follow_up_timesheet.create_from_project_daily_timesheet_batch"
+	},
+	"Stock Entry": {
+		"before_submit": "mobile_api.utils.material_transfer_handover_stock_entry.validate_material_transfer_handover",
+		"on_submit": "mobile_api.utils.material_transfer_handover_stock_entry.create_material_transfer_handover",
+		"on_cancel": "mobile_api.utils.material_transfer_handover_stock_entry.cancel_material_transfer_handover",
+	},
+	"Task Follow Up": {
+		"after_insert": "mobile_api.utils.tpg_task_follow_up_sync.sync_mobile_from_tpg",
+		"on_update": "mobile_api.utils.tpg_task_follow_up_sync.sync_mobile_from_tpg",
+		"on_update_after_submit": "mobile_api.utils.tpg_task_follow_up_sync.sync_mobile_from_tpg",
+		"on_cancel": "mobile_api.utils.tpg_task_follow_up_sync.cancel_mobile_from_tpg",
+	},
+	"Mobile Task Follow Up": {
+		"after_insert": "mobile_api.utils.tpg_task_follow_up_sync.sync_tpg_from_mobile",
+		"on_update": "mobile_api.utils.tpg_task_follow_up_sync.sync_tpg_from_mobile",
 	},
 }
 
@@ -195,13 +214,15 @@ doc_events = {
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+permission_query_conditions = {
+	"Mobile Task Follow Up": "mobile_api.utils.mobile_task_follow_up_permissions.mobile_task_follow_up_permission_query",
+	"Mobile Material Transfer Handover": "mobile_api.utils.material_transfer_handover_permissions.material_transfer_handover_permission_query",
+}
+
+has_permission = {
+	"Mobile Task Follow Up": "mobile_api.utils.mobile_task_follow_up_permissions.mobile_task_follow_up_has_permission",
+	"Mobile Material Transfer Handover": "mobile_api.utils.material_transfer_handover_permissions.material_transfer_handover_has_permission",
+}
 
 # DocType Class
 # ---------------

@@ -1,0 +1,115 @@
+{
+ "actions": [],
+ "creation": "2026-08-22 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "auto_create_task_follow_up",
+  "require_pickup_photo",
+  "require_pickup_location",
+  "require_delivery_photo",
+  "require_delivery_location",
+  "require_return_photo",
+  "require_return_location",
+  "max_photo_size_kb",
+  "return_allowed_days_after_submit"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "1",
+   "fieldname": "auto_create_task_follow_up",
+   "fieldtype": "Check",
+   "label": "Auto Create Task Follow Up"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_pickup_photo",
+   "fieldtype": "Check",
+   "label": "Require Pickup Photo"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_pickup_location",
+   "fieldtype": "Check",
+   "label": "Require Pickup Location"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_delivery_photo",
+   "fieldtype": "Check",
+   "label": "Require Delivery Photo"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_delivery_location",
+   "fieldtype": "Check",
+   "label": "Require Delivery Location"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_return_photo",
+   "fieldtype": "Check",
+   "label": "Require Return Photo"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_return_location",
+   "fieldtype": "Check",
+   "label": "Require Return Location"
+  },
+  {
+   "default": "2048",
+   "fieldname": "max_photo_size_kb",
+   "fieldtype": "Int",
+   "label": "Max Photo Size KB"
+  },
+  {
+   "default": "1",
+   "fieldname": "return_allowed_days_after_submit",
+   "fieldtype": "Int",
+   "label": "Return Allowed Days After Submit"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-22 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mobile Api",
+ "name": "Mobile Material Transfer Handover Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Stock Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

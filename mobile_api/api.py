@@ -16,6 +16,16 @@ from mobile_api.handlers.task_handler import (
     add_follow_up,
     update_task_status
 )
+from mobile_api.handlers.mobile_task_follow_up_handler import (
+    create_mobile_task_follow_up,
+    get_my_mobile_task_follow_ups,
+    get_assigned_mobile_task_follow_ups,
+    get_mobile_task_follow_up_details,
+    add_mobile_task_follow_up_update,
+    close_mobile_task_follow_up,
+    get_mobile_task_follow_up_notifications,
+    mark_mobile_task_follow_up_read,
+)
 from mobile_api.handlers.crm_follow_up_handler import (
     get_crm_doc_details,
     add_crm_follow_up,
@@ -65,6 +75,14 @@ from mobile_api.handlers.notification_handler import (
 from mobile_api.handlers.material_request_handler import (
     create_material_request
 )
+from mobile_api.handlers.material_transfer_handover_handler import (
+    get_my_material_transfer_handovers,
+    get_material_transfer_handover_details,
+    confirm_material_transfer_pickup,
+    confirm_material_transfer_delivery,
+    get_material_transfer_return_options,
+    create_material_transfer_return,
+)
 from mobile_api.handlers.hr_attendance_handler import (
     get_hr_attendance_context,
     get_mobile_device_verification_status,
@@ -80,6 +98,14 @@ __all__ = [
     'get_task_details',
     'add_follow_up',
     'update_task_status',
+    'create_mobile_task_follow_up',
+    'get_my_mobile_task_follow_ups',
+    'get_assigned_mobile_task_follow_ups',
+    'get_mobile_task_follow_up_details',
+    'add_mobile_task_follow_up_update',
+    'close_mobile_task_follow_up',
+    'get_mobile_task_follow_up_notifications',
+    'mark_mobile_task_follow_up_read',
     'get_crm_doc_details',
     'add_crm_follow_up',
     'get_lead_form',
@@ -117,6 +143,12 @@ __all__ = [
     'get_workflow_notifications',
     'get_workflow_notifications_summary',
     'create_material_request',
+    'get_my_material_transfer_handovers',
+    'get_material_transfer_handover_details',
+    'confirm_material_transfer_pickup',
+    'confirm_material_transfer_delivery',
+    'get_material_transfer_return_options',
+    'create_material_transfer_return',
     'get_hr_attendance_context',
     'get_mobile_device_verification_status',
     'mobile_employee_checkin',

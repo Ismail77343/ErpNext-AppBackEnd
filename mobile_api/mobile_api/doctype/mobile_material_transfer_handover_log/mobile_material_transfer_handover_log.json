@@ -1,0 +1,110 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-08-22 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "event_type",
+  "event_on",
+  "event_by",
+  "stock_entry",
+  "photo",
+  "photo_file",
+  "location",
+  "latitude",
+  "longitude",
+  "accuracy_meters",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "event_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Event Type",
+   "options": "Pickup\nDelivery\nReturn Draft Created\nCancelled",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Event On",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Event By",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "label": "Stock Entry",
+   "options": "Stock Entry"
+  },
+  {
+   "fieldname": "photo",
+   "fieldtype": "Attach",
+   "label": "Photo"
+  },
+  {
+   "fieldname": "photo_file",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Photo File",
+   "options": "File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Geolocation",
+   "label": "Location",
+   "read_only": 1
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Latitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Longitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "accuracy_meters",
+   "fieldtype": "Float",
+   "label": "Accuracy Meters",
+   "read_only": 1
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  }
+ ],
+ "grid_page_length": 20,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-22 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mobile Api",
+ "name": "Mobile Material Transfer Handover Log",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

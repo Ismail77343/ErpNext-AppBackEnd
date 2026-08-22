@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "creation": "2026-08-20 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "auto_create_from_timesheet_distribution",
+  "sync_with_tpg_task_follow_up",
+  "notify_assignee_in_app",
+  "default_due_days"
+ ],
+ "fields": [
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "default": "0",
+   "fieldname": "auto_create_from_timesheet_distribution",
+   "fieldtype": "Check",
+   "label": "Auto Create From Timesheet Distribution"
+  },
+  {
+   "default": "1",
+   "description": "Synchronize with the desk Task Follow Up DocType when it is installed.",
+   "fieldname": "sync_with_tpg_task_follow_up",
+   "fieldtype": "Check",
+   "label": "Sync With TPG Task Follow Up"
+  },
+  {
+   "default": "1",
+   "fieldname": "notify_assignee_in_app",
+   "fieldtype": "Check",
+   "label": "Notify Assignee In App"
+  },
+  {
+   "default": "1",
+   "fieldname": "default_due_days",
+   "fieldtype": "Int",
+   "label": "Default Due Days"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-08-20 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mobile Api",
+ "name": "Mobile Task Follow Up Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Projects Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

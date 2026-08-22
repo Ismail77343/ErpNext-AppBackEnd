@@ -1,0 +1,279 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:MTFU-{YYYY}-{#####}",
+ "creation": "2026-08-20 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "subject",
+  "details",
+  "priority",
+  "status",
+  "progress",
+  "assignment_section",
+  "assigned_to_employee",
+  "assigned_to_user",
+  "assigned_by",
+  "read_by_assignee",
+  "read_on",
+  "dates_section",
+  "start_date",
+  "due_date",
+  "closed_by",
+  "closed_on",
+  "reference_section",
+  "project",
+  "task",
+  "tpg_task_follow_up",
+  "source_doctype",
+  "source_name",
+  "source_row",
+  "source_timesheet",
+  "updates_section",
+  "updates"
+ ],
+ "fields": [
+  {
+   "fieldname": "subject",
+   "fieldtype": "Data",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_preview": 1,
+   "label": "Subject",
+   "reqd": 1
+  },
+  {
+   "fieldname": "details",
+   "fieldtype": "Text Editor",
+   "label": "Details"
+  },
+  {
+   "default": "Medium",
+   "fieldname": "priority",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Priority",
+   "options": "Low\nMedium\nHigh"
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Open\nWorking\nBlocked\nOverdue\nCompleted\nCancelled",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "progress",
+   "fieldtype": "Percent",
+   "in_list_view": 1,
+   "label": "Progress"
+  },
+  {
+   "fieldname": "assignment_section",
+   "fieldtype": "Section Break",
+   "label": "Assignment"
+  },
+  {
+   "fieldname": "assigned_to_employee",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Assigned To Employee",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "assigned_to_user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Assigned To User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "assigned_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Assigned By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "read_by_assignee",
+   "fieldtype": "Check",
+   "label": "Read By Assignee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "read_on",
+   "fieldtype": "Datetime",
+   "label": "Read On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "dates_section",
+   "fieldtype": "Section Break",
+   "label": "Dates"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_standard_filter": 1,
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "closed_by",
+   "fieldtype": "Link",
+   "label": "Closed By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "closed_on",
+   "fieldtype": "Datetime",
+   "label": "Closed On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_section",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "task",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Task",
+   "options": "Task"
+  },
+  {
+   "fieldname": "tpg_task_follow_up",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "TPG Task Follow Up",
+   "options": "Task Follow Up",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_doctype",
+   "fieldtype": "Link",
+   "label": "Source DocType",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_name",
+   "fieldtype": "Data",
+   "label": "Source Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_row",
+   "fieldtype": "Data",
+   "label": "Source Row",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_timesheet",
+   "fieldtype": "Link",
+   "label": "Source Timesheet",
+   "options": "Timesheet",
+   "read_only": 1
+  },
+  {
+   "fieldname": "updates_section",
+   "fieldtype": "Section Break",
+   "label": "Updates"
+  },
+  {
+   "fieldname": "updates",
+   "fieldtype": "Table",
+   "label": "Updates",
+   "options": "Mobile Task Follow Up Update",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-20 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mobile Api",
+ "name": "Mobile Task Follow Up",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Projects Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Projects User",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Employee",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "subject,assigned_to_user,assigned_by,project,task",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "subject"
+}

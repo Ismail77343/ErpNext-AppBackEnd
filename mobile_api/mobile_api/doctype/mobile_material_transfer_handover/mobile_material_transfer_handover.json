@@ -1,0 +1,403 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:MMTH-{YYYY}-{#####}",
+ "creation": "2026-08-22 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "stock_entry",
+  "company",
+  "posting_date",
+  "submitted_on",
+  "status",
+  "receiver_section",
+  "receiver_user",
+  "receiver_employee",
+  "assigned_by",
+  "warehouse_section",
+  "from_warehouse",
+  "to_warehouse",
+  "pickup_section",
+  "pickup_photo",
+  "pickup_file",
+  "pickup_on",
+  "pickup_by",
+  "pickup_location",
+  "pickup_latitude",
+  "pickup_longitude",
+  "pickup_accuracy_meters",
+  "delivery_section",
+  "delivery_photo",
+  "delivery_file",
+  "delivery_on",
+  "delivery_by",
+  "delivery_location",
+  "delivery_latitude",
+  "delivery_longitude",
+  "delivery_accuracy_meters",
+  "return_section",
+  "return_allowed_until",
+  "last_return_stock_entry",
+  "last_return_photo",
+  "last_return_file",
+  "last_return_on",
+  "last_return_location",
+  "last_return_latitude",
+  "last_return_longitude",
+  "last_return_accuracy_meters",
+  "return_count",
+  "reference_section",
+  "task_follow_up",
+  "logs_section",
+  "logs"
+ ],
+ "fields": [
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "in_global_search": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Stock Entry",
+   "options": "Stock Entry",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Posting Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "submitted_on",
+   "fieldtype": "Datetime",
+   "label": "Submitted On",
+   "read_only": 1
+  },
+  {
+   "default": "Pending Pickup",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Pending Pickup\nPicked Up\nDelivered\nReturn Draft Created\nClosed\nCancelled",
+   "reqd": 1
+  },
+  {
+   "fieldname": "receiver_section",
+   "fieldtype": "Section Break",
+   "label": "Receiver"
+  },
+  {
+   "fieldname": "receiver_user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Receiver User",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "receiver_employee",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Receiver Employee",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "assigned_by",
+   "fieldtype": "Link",
+   "label": "Assigned By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "warehouse_section",
+   "fieldtype": "Section Break",
+   "label": "Warehouses"
+  },
+  {
+   "fieldname": "from_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "From Warehouse",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "to_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "To Warehouse",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_section",
+   "fieldtype": "Section Break",
+   "label": "Pickup"
+  },
+  {
+   "fieldname": "pickup_photo",
+   "fieldtype": "Attach",
+   "label": "Pickup Photo",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_file",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Pickup File",
+   "options": "File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_on",
+   "fieldtype": "Datetime",
+   "label": "Pickup On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_by",
+   "fieldtype": "Link",
+   "label": "Pickup By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_location",
+   "fieldtype": "Geolocation",
+   "label": "Pickup Location",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_latitude",
+   "fieldtype": "Float",
+   "label": "Pickup Latitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_longitude",
+   "fieldtype": "Float",
+   "label": "Pickup Longitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "pickup_accuracy_meters",
+   "fieldtype": "Float",
+   "label": "Pickup Accuracy Meters",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_section",
+   "fieldtype": "Section Break",
+   "label": "Delivery"
+  },
+  {
+   "fieldname": "delivery_photo",
+   "fieldtype": "Attach",
+   "label": "Delivery Photo",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_file",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Delivery File",
+   "options": "File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_on",
+   "fieldtype": "Datetime",
+   "label": "Delivery On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_by",
+   "fieldtype": "Link",
+   "label": "Delivery By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_location",
+   "fieldtype": "Geolocation",
+   "label": "Delivery Location",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_latitude",
+   "fieldtype": "Float",
+   "label": "Delivery Latitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_longitude",
+   "fieldtype": "Float",
+   "label": "Delivery Longitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delivery_accuracy_meters",
+   "fieldtype": "Float",
+   "label": "Delivery Accuracy Meters",
+   "read_only": 1
+  },
+  {
+   "fieldname": "return_section",
+   "fieldtype": "Section Break",
+   "label": "Return"
+  },
+  {
+   "fieldname": "return_allowed_until",
+   "fieldtype": "Date",
+   "in_standard_filter": 1,
+   "label": "Return Allowed Until",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_stock_entry",
+   "fieldtype": "Link",
+   "label": "Last Return Stock Entry",
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_photo",
+   "fieldtype": "Attach",
+   "label": "Last Return Photo",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_file",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Last Return File",
+   "options": "File",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_on",
+   "fieldtype": "Datetime",
+   "label": "Last Return On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_location",
+   "fieldtype": "Geolocation",
+   "label": "Last Return Location",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_latitude",
+   "fieldtype": "Float",
+   "label": "Last Return Latitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_longitude",
+   "fieldtype": "Float",
+   "label": "Last Return Longitude",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_return_accuracy_meters",
+   "fieldtype": "Float",
+   "label": "Last Return Accuracy Meters",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "return_count",
+   "fieldtype": "Int",
+   "label": "Return Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_section",
+   "fieldtype": "Section Break",
+   "label": "Reference"
+  },
+  {
+   "fieldname": "task_follow_up",
+   "fieldtype": "Link",
+   "label": "Mobile Task Follow Up",
+   "options": "Mobile Task Follow Up",
+   "read_only": 1
+  },
+  {
+   "fieldname": "logs_section",
+   "fieldtype": "Section Break",
+   "label": "Logs"
+  },
+  {
+   "fieldname": "logs",
+   "fieldtype": "Table",
+   "label": "Logs",
+   "options": "Mobile Material Transfer Handover Log",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-22 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Mobile Api",
+ "name": "Mobile Material Transfer Handover",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Stock Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Stock User"
+  },
+  {
+   "read": 1,
+   "role": "Employee"
+  }
+ ],
+ "row_format": "Dynamic",
+ "search_fields": "stock_entry,receiver_user,from_warehouse,to_warehouse",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "stock_entry"
+}
