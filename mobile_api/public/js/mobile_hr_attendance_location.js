@@ -54,32 +54,27 @@ function add_location_actions(frm) {
 
 function show_location_picker(frm) {
 	const current = get_doc_point(frm.doc) || get_point_from_geolocation(frm.doc.location_preview);
-	const defaults = get_map_defaults();
+	const defaults = frappe.utils.map_defaults || {};
 	const start = current || {
-		latitude: defaults.center[0],
-		longitude: defaults.center[1],
+		latitude: (defaults.center || [24.7136, 46.6753])[0],
+		longitude: (defaults.center || [24.7136, 46.6753])[1],
 	};
 	let selected = { ...start };
 	let selected_radius = cint(frm.doc.radius_meters || 150) || 150;
 	let map = null;
 	let marker = null;
 	let circle = null;
+	let map_setup_attempts = 0;
 
 	const dialog = new frappe.ui.Dialog({
 		title: __("Pick Location"),
 		size: "large",
 		fields: [
 			{
-				fieldname: "map_area",
-				fieldtype: "HTML",
-				options: `
-					<div class="mobile-hr-location-picker-map" style="height: 520px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-light-gray);"></div>
-					<div class="text-muted small mt-2">${__("Click on the map or drag the marker to set the location.")}</div>
-					<div class="mobile-hr-location-map-status text-muted small mt-1"></div>
-					<div class="mobile-hr-location-tools" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px;">
-						<button class="btn btn-xs btn-default" data-action="current">${__("Use Current Location")}</button>
-						<button class="btn btn-xs btn-default" data-action="existing">${__("Center on Saved Location")}</button>
-					</div>`,
+				fieldname: "location_map",
+				fieldtype: "Geolocation",
+				label: __("Location Map"),
+				description: __("Click on the map or drag the marker to set the attendance location."),
 			},
 			{
 				fieldname: "radius_meters",
@@ -99,6 +94,14 @@ function show_location_picker(frm) {
 				label: __("Selected Coordinates"),
 				read_only: 1,
 			},
+			{
+				fieldname: "map_tools",
+				fieldtype: "HTML",
+				options: `<div class="mobile-hr-location-tools" style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px;">
+					<button class="btn btn-xs btn-default" data-action="current">${__("Use Current Location")}</button>
+					<button class="btn btn-xs btn-default" data-action="existing">${__("Center on Saved Location")}</button>
+				</div>`,
+			},
 		],
 		primary_action_label: __("Apply Location"),
 		primary_action() {
@@ -115,67 +118,40 @@ function show_location_picker(frm) {
 	dialog.show();
 	dialog.set_value("radius_meters", selected_radius);
 	set_dialog_coordinates(dialog, selected, selected_radius);
-	show_map_status(dialog, __("Loading map..."));
-
-	load_leaflet()
-		.then(() => {
-			setTimeout(initialize_map, 200);
-		})
-		.catch((error) => {
-			console.error("Unable to load Leaflet for attendance location picker", error);
-			show_map_status(
-				dialog,
-				__("Map library could not be loaded. Check that Frappe assets are available, then refresh the page."),
-				"red"
-			);
-			frappe.msgprint(__("Map library could not be loaded. Refresh the page and try again."));
-		});
+	setTimeout(initialize_map, 100);
 
 	function initialize_map() {
-		const wrapper = dialog.$wrapper.find(".mobile-hr-location-picker-map").get(0);
-		if (!wrapper || typeof window.L === "undefined") {
-			show_map_status(dialog, __("Map library is not loaded. Refresh the page and try again."), "red");
+		const control = dialog.fields_dict.location_map;
+		if ((!control || !control.map || typeof window.L === "undefined") && map_setup_attempts < 30) {
+			map_setup_attempts += 1;
+			setTimeout(initialize_map, 100);
 			return;
 		}
+		if (!control || !control.map || typeof window.L === "undefined") {
+			frappe.msgprint(__("The map could not be initialized. Refresh the page and try again."));
+			return;
+		}
+		if (control.__mobile_hr_picker_ready) return;
+		control.__mobile_hr_picker_ready = true;
 
 		const L = window.L;
-		const map_defaults = get_map_defaults();
-
-		map = L.map(wrapper, { zoomControl: true }).setView(
-			[start.latitude, start.longitude],
-			current ? 16 : map_defaults.zoom
-		);
-		map.attributionControl.setPrefix("");
-
-		const tile_layer = L.tileLayer(map_defaults.tiles, map_defaults.options).addTo(map);
-		tile_layer.on("tileerror", () => {
-			if (map.__mobile_hr_used_fallback_tiles) return;
-			map.__mobile_hr_used_fallback_tiles = true;
-			show_map_status(
-				dialog,
-				__("Configured map tiles did not load. Trying the default OpenStreetMap tiles..."),
-				"orange"
-			);
-			L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-				maxZoom: 19,
-				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-			})
-				.on("load", () => show_map_status(dialog, ""))
-				.on("tileerror", () => {
-					show_map_status(
-						dialog,
-						__("Map tiles are blocked or unreachable from this browser/network."),
-						"red"
-					);
-				})
-				.addTo(map);
+		map = control.map;
+		if (control.draw_control) map.removeControl(control.draw_control);
+		if (control.editableLayers) control.clear_editable_layers();
+		dialog.$wrapper.find(".map-wrapper > div").css({
+			"min-height": "410px",
+			cursor: "crosshair",
 		});
-		tile_layer.on("load", () => show_map_status(dialog, ""));
+		map.setView([start.latitude, start.longitude], current ? 16 : defaults.zoom || 10);
 
 		marker = L.marker([start.latitude, start.longitude], {
 			draggable: true,
-			icon: get_leaflet_marker_icon(L),
+			icon: make_picker_marker_icon(L),
 		}).addTo(map);
+		marker.bindTooltip(__("Selected attendance location"), {
+			direction: "top",
+			offset: [0, -34],
+		});
 		circle = L.circle([start.latitude, start.longitude], {
 			radius: selected_radius,
 			color: "#1f8ef1",
@@ -190,6 +166,7 @@ function show_location_picker(frm) {
 				longitude: flt(latlng.lng, 8),
 			};
 			marker.setLatLng([selected.latitude, selected.longitude]);
+			marker.openTooltip();
 			refresh_circle();
 			set_dialog_coordinates(dialog, selected, selected_radius);
 			if (zoom_to_point) map.setView([selected.latitude, selected.longitude], Math.max(map.getZoom(), 16));
@@ -197,6 +174,7 @@ function show_location_picker(frm) {
 
 		map.on("click", (event) => apply_point(event.latlng));
 		marker.on("dragend", () => apply_point(marker.getLatLng()));
+		marker.openTooltip();
 
 		dialog.$wrapper.find('[data-action="existing"]').on("click", () => {
 			if (!has_coordinates(frm.doc)) {
@@ -210,7 +188,11 @@ function show_location_picker(frm) {
 			read_browser_location((point) => apply_point({ lat: point.latitude, lng: point.longitude }, true));
 		});
 
-		invalidate_map_size(map);
+		window.requestAnimationFrame(() => {
+			map.invalidateSize();
+			setTimeout(() => map.invalidateSize(), 250);
+			setTimeout(() => map.invalidateSize(), 750);
+		});
 	}
 
 	function refresh_circle() {
@@ -220,22 +202,28 @@ function show_location_picker(frm) {
 	}
 }
 
-function show_map_status(dialog, message, indicator) {
-	const $status = dialog.$wrapper.find(".mobile-hr-location-map-status");
-	if (!$status.length) return;
-
-	$status
-		.toggleClass("text-danger", indicator === "red")
-		.toggleClass("text-warning", indicator === "orange")
-		.toggleClass("text-muted", !indicator)
-		.text(message || "");
-}
-
-function invalidate_map_size(map) {
-	window.requestAnimationFrame(() => {
-		map.invalidateSize();
-		setTimeout(() => map.invalidateSize(), 250);
-		setTimeout(() => map.invalidateSize(), 750);
+function make_picker_marker_icon(L) {
+	return L.divIcon({
+		className: "mobile-hr-picker-marker-wrapper",
+		iconSize: [32, 44],
+		iconAnchor: [16, 44],
+		popupAnchor: [0, -42],
+		html: `<div style="
+			width:30px;
+			height:30px;
+			background:#1683e8;
+			border:3px solid #fff;
+			border-radius:50% 50% 50% 0;
+			box-shadow:0 2px 10px rgba(0,0,0,.45);
+			transform:rotate(-45deg);
+		"><span style="
+			display:block;
+			width:9px;
+			height:9px;
+			margin:8px;
+			background:#fff;
+			border-radius:50%;
+		"></span></div>`,
 	});
 }
 
@@ -359,106 +347,4 @@ async function set_location_values(frm, values) {
 	} finally {
 		frm.__mobile_hr_syncing_location = false;
 	}
-}
-
-let mobile_hr_leaflet_loading = null;
-
-function load_leaflet() {
-	ensure_stylesheet("/assets/frappe/js/lib/leaflet/leaflet.css");
-
-	if (typeof window.L !== "undefined") {
-		return Promise.resolve();
-	}
-
-	if (mobile_hr_leaflet_loading) {
-		return mobile_hr_leaflet_loading;
-	}
-
-	mobile_hr_leaflet_loading = new Promise((resolve, reject) => {
-		const existing_script = Array.from(document.querySelectorAll("script[src]")).find((script) =>
-			(script.getAttribute("src") || "").includes("/assets/frappe/js/lib/leaflet/leaflet.js")
-		);
-
-		const resolve_when_ready = () => {
-			setTimeout(() => {
-				if (typeof window.L !== "undefined") {
-					resolve();
-				} else {
-					reject(new Error("Leaflet script loaded but window.L is unavailable"));
-				}
-			}, 100);
-		};
-
-		if (existing_script) {
-			existing_script.addEventListener("load", resolve_when_ready, { once: true });
-			existing_script.addEventListener("error", reject, { once: true });
-			setTimeout(resolve_when_ready, 100);
-			return;
-		}
-
-		const script = document.createElement("script");
-		script.src = "/assets/frappe/js/lib/leaflet/leaflet.js";
-		script.async = true;
-		script.onload = resolve_when_ready;
-		script.onerror = () => reject(new Error("Unable to load /assets/frappe/js/lib/leaflet/leaflet.js"));
-		document.head.appendChild(script);
-	});
-
-	mobile_hr_leaflet_loading.catch(() => {
-		mobile_hr_leaflet_loading = null;
-	});
-
-	return mobile_hr_leaflet_loading;
-}
-
-function ensure_stylesheet(href) {
-	const exists = Array.from(document.querySelectorAll("link[rel='stylesheet']")).some((link) =>
-		(link.getAttribute("href") || "").includes("leaflet.css")
-	);
-	if (exists) return;
-
-	const link = document.createElement("link");
-	link.rel = "stylesheet";
-	link.href = href;
-	document.head.appendChild(link);
-}
-
-function get_leaflet_marker_icon(L) {
-	return L.divIcon({
-		className: "mobile-hr-location-marker",
-		iconSize: [28, 40],
-		iconAnchor: [14, 40],
-		popupAnchor: [0, -36],
-		html: `
-			<div style="
-				width: 28px;
-				height: 28px;
-				background: #1683e8;
-				border: 2px solid #ffffff;
-				border-radius: 50% 50% 50% 0;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-				transform: rotate(-45deg);
-			">
-				<div style="
-					width: 8px;
-					height: 8px;
-					margin: 8px;
-					background: #ffffff;
-					border-radius: 50%;
-				"></div>
-			</div>`,
-	});
-}
-
-function get_map_defaults() {
-	const defaults = frappe.utils.map_defaults || {};
-	return {
-		center: defaults.center || [24.7136, 46.6753],
-		zoom: defaults.zoom || 10,
-		tiles: defaults.tiles || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-		options: defaults.options || {
-			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-		},
-		image_path: defaults.image_path || "/assets/frappe/images/leaflet/",
-	};
 }
